@@ -3,5 +3,5 @@ export function animateLoop(renderer, scene, camera) {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
   }
-  animate();
+  animate(); //????
 }
