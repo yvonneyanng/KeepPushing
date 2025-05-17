@@ -1,62 +1,80 @@
 import { Car, setupCamera } from "./carControl.js";
 
-export function initGame(scene, camera, renderer) {
+import { loadCarModel, updateCar } from "./car.js"
+
+export function initGame(scene, camera, renderer, world, wallBodies) {
   // Create car
-  const car = new Car(scene);
+  // const car = new Car(scene);
+  let carModel, carBody, carWrapper, carShaderMaterial;
 
-  // Setup camera to follow car
-  const updateCamera = setupCamera(camera, car);
-
-  // Create finish message element
-  const finishMessage = document.createElement("div");
-  finishMessage.style.position = "absolute";
-  finishMessage.style.top = "20px";
-  finishMessage.style.right = "20px";
-  finishMessage.style.color = "white";
-  finishMessage.style.fontSize = "32px";
-  finishMessage.style.fontFamily = "Arial";
-  finishMessage.style.textShadow = "2px 2px 4px rgba(0,0,0,0.5)";
-  finishMessage.style.display = "none";
-  document.body.appendChild(finishMessage);
-
-  // Handle keyboard input
-  const keys = {
-    ArrowLeft: false,
-    ArrowRight: false,
-  };
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key in keys) {
-      keys[e.key] = true;
-    }
+  loadCarModel(scene, world)
+  .then(({ carModel: loadedCarModel, carWrapper: loadedCarWrapper, carBody: loadedCarBody, vehicle }) => {
+    carModel = loadedCarModel;
+    carWrapper = loadedCarWrapper;
+    carBody = loadedCarBody;
+    // For controls.js to access the vehicle
+    window.vehicle = vehicle;
+    // Optionally, set up wheelMeshes or other car-specific logic here
   });
 
-  window.addEventListener("keyup", (e) => {
-    if (e.key in keys) {
-      keys[e.key] = false;
-      car.resetSteering();
-    }
-  });
+  
+
+  // // Setup camera to follow car
+  // const updateCamera = setupCamera(camera, car);
+
+  // // Create finish message element
+  // const finishMessage = document.createElement("div");
+  // finishMessage.style.position = "absolute";
+  // finishMessage.style.top = "20px";
+  // finishMessage.style.right = "20px";
+  // finishMessage.style.color = "white";
+  // finishMessage.style.fontSize = "32px";
+  // finishMessage.style.fontFamily = "Arial";
+  // finishMessage.style.textShadow = "2px 2px 4px rgba(0,0,0,0.5)";
+  // finishMessage.style.display = "none";
+  // document.body.appendChild(finishMessage);
+
+  // // Handle keyboard input
+  // const keys = {
+  //   ArrowLeft: false,
+  //   ArrowRight: false,
+  // };
+
+  // window.addEventListener("keydown", (e) => {
+  //   if (e.key in keys) {
+  //     keys[e.key] = true;
+  //   }
+  // });
+
+  // window.addEventListener("keyup", (e) => {
+  //   if (e.key in keys) {
+  //     keys[e.key] = false;
+  //     car.resetSteering();
+  //   }
+  // });
 
   // Animation loop
   function animate() {
     requestAnimationFrame(animate);
 
-    // Handle steering
-    if (keys.ArrowLeft) car.steer(-1);
-    if (keys.ArrowRight) car.steer(1);
-
-    // Update car position
-    car.update();
-
-    // Check if car has stopped (reached finish)
-    if (!car.isMoving && finishMessage.style.display === "none") {
-      finishMessage.textContent = "FINISH!";
-      finishMessage.style.display = "block";
+    if (carBody && carWrapper) {
+      updateCar(carBody, carWrapper, window.vehicle, camera, wallBodies, world);
     }
+    // // Handle steering
+    // if (keys.ArrowLeft) car.steer(-1);
+    // if (keys.ArrowRight) car.steer(1);
 
-    // Update camera
-    updateCamera();
+    // // Update car position
+    // car.update();
+
+    // // Check if car has stopped (reached finish)
+    // if (!car.isMoving && finishMessage.style.display === "none") {
+    //   finishMessage.textContent = "FINISH!";
+    //   finishMessage.style.display = "block";
+    // }
+
+    // // Update camera
+    // updateCamera();
 
     // Render scene
     renderer.render(scene, camera);
