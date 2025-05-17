@@ -1,7 +1,8 @@
+import * as CANNON from 'cannon-es';
 import * as THREE from "three";
 
 // Create a curved road
-const roadWidth = 10;
+const roadWidth = 20;
 const roadLength = 10000; // 10 kilometers (10000 meters)
 
 // Create a curved path for the road
@@ -38,7 +39,7 @@ const curve = new THREE.CatmullRomCurve3([
 // Create the road geometry using TubeGeometry
 const roadGeometry = new THREE.TubeGeometry(
   curve,
-  500,
+  1000,
   roadWidth / 2,
   8,
   false
@@ -134,5 +135,68 @@ for (let i = 1; i <= 10; i++) {
   roadMesh.add(marker);
 }
 
-// Export the curve for car movement
-export { roadMesh, roadWidth, roadLength, curve };
+// Convert geometry to Cannon-es Trimesh shape
+function createTrimesh(geometry) {
+
+  const position = geometry.attributes.position;
+  const indices = geometry.index ? geometry.index.array : null;
+
+  const vertices = [];
+  for (let i = 0; i < position.count; i++) {
+    vertices.push(position.getX(i), position.getY(i), position.getZ(i));
+  }
+
+  const indicesArray = indices ? Array.from(indices) : [...Array(position.count).keys()];
+
+  return new CANNON.Trimesh(vertices, indicesArray);
+}
+
+// --- Tunnel wall geometry creation ---
+const wallCannonMaterial = new CANNON.Material('wall');
+const wallMaterial = new THREE.MeshPhongMaterial({
+  color: 0x888888,
+  emissive: 0x222222,
+});
+const wallBoxes = [];
+const wallBodies = [];
+const spacing = 5;
+const wallWidth = 1;
+const wallHeight = 5;
+const wallDepth = 2;
+
+for (let i = 0; i <= roadLength; i += spacing) {
+  const t = i / roadLength;
+  const point = curve.getPointAt(t);
+  const tangent = curve.getTangentAt(t);
+  const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
+
+  [-1, 1].forEach((side) => {
+    const offset = normal.clone().multiplyScalar((roadWidth / 2 + wallWidth / 2) * side);
+    const wallPos = point.clone().add(offset);
+    const angle = Math.atan2(tangent.x, tangent.z);
+
+    // Create THREE mesh
+    const wallGeometry = new THREE.BoxGeometry(wallWidth, wallHeight, wallDepth);
+    const wallMesh = new THREE.Mesh(wallGeometry, wallMaterial);
+    wallMesh.position.copy(wallPos);
+    wallMesh.rotation.y = angle;
+    wallMesh.castShadow = true;
+    wallBoxes.push(wallMesh);
+    roadMesh.add(wallMesh);
+
+    // Create CANNON body
+    const halfExtents = new CANNON.Vec3(wallWidth / 2, wallHeight / 2, wallDepth / 2);
+    const boxShape = new CANNON.Box(halfExtents);
+    const wallBody = new CANNON.Body({
+      mass: 0,
+      shape: boxShape,
+      material: wallCannonMaterial,
+      position: new CANNON.Vec3(wallPos.x, wallPos.y, wallPos.z),
+    });
+    wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), angle);
+    wallBodies.push(wallBody);
+  });
+}
+
+// Export wallBodies as array
+export { roadMesh, roadWidth, roadLength, curve, wallBodies, wallCannonMaterial };
