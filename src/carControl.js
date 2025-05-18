@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { roadWidth, roadLength, curve } from "./trackGeneration.js";
 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
 export class Car {
   constructor(scene) {
     // Create car body
@@ -55,7 +57,7 @@ export class Car {
 
     // Car movement properties
     this.t = 0; // Position along curve (0 to 1)
-    this.speed = 0.0002; // Reduced speed for better control
+    this.speed = 0.00000; // Reduced speed for better control
     this.offset = new THREE.Vector3(); // Lateral offset from curve
     this.steeringSpeed = 0.1; // How fast the car can move left/right
     this.maxSteering = roadWidth / 2 - 1; // Keep car within road bounds
@@ -127,10 +129,10 @@ export class Car {
     // Update speed display
     this.updateSpeedDisplay();
 
-    // Animate wheels
-    this.wheels.forEach((wheel) => {
-      wheel.rotation.x += this.speed * 2000;
-    });
+    // // Animate wheels
+    // this.wheels.forEach((wheel) => {
+    //   wheel.rotation.x += this.speed * 2000;
+    // });
   }
 
   steer(direction) {
@@ -174,7 +176,7 @@ export function setupCamera(camera, car) {
     matrix.lookAt(carPosition, lookAt, up);
 
     // Apply smooth camera movement
-    camera.position.lerp(targetPosition, 0.1);
+    camera.position.lerp(targetPosition, 0.08);
 
     // Make camera look at car's position slightly ahead
     const lookAtPoint = car.car.position.clone();
