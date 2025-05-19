@@ -96,16 +96,27 @@ planeGeometry.setAttribute(
   "position",
   new THREE.Float32BufferAttribute(vertices, 3)
 );
+// Compute UVs for texture mapping
+const uvs = [];
+for (let i = 0; i < planePoints.length; i++) {
+  const u = (i % 2 === 0) ? 0 : 1;
+  const v = i / (planePoints.length - 2);
+  uvs.push(u, v);
+}
+planeGeometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 planeGeometry.setIndex(indices);
 planeGeometry.computeVertexNormals();
 
-// Create plane material
+// Create plane material with texture
+const textureLoader = new THREE.TextureLoader();
+const roadTexture = textureLoader.load('/textures/road.png');
+roadTexture.wrapS = THREE.RepeatWrapping;
+roadTexture.wrapT = THREE.RepeatWrapping;
+roadTexture.repeat.set(1, 50); // Adjust tiling to suit length of road
+
 const planeMaterial = new THREE.MeshPhongMaterial({
-  color: 0x00ff00, // Green color
-  transparent: true,
-  opacity: 1,
+  map: roadTexture,
   side: THREE.DoubleSide,
-  emissive: 0x003300,
 });
 
 // Create plane mesh

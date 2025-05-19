@@ -160,7 +160,7 @@ export function updateCar(carBody, carWrapper, vehicle, camera, wallBodies, worl
   // }
 
   updateControls(carBody);
-  const offset = new THREE.Vector3(0, 5, 10);
+  const offset = new THREE.Vector3(0, 3, 10);
   offset.applyQuaternion(carWrapper.quaternion);
   const carPos = new THREE.Vector3(carBody.position.x, carBody.position.y, carBody.position.z);
   camera.lookAt(carPos);
