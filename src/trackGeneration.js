@@ -45,9 +45,12 @@ const roadGeometry = new THREE.TubeGeometry(
   false
 );
 const roadMaterial = new THREE.MeshPhongMaterial({
-  color: 0x222222, // Darker gray for road
+  color: 0x222222,
+  emissive: 0x111111,
+  transparent: true,
+  opacity: 0,
+  depthWrite: false,
   side: THREE.DoubleSide,
-  emissive: 0x111111, // Slight glow
 });
 
 // Create the road mesh
@@ -156,13 +159,15 @@ const wallCannonMaterial = new CANNON.Material('wall');
 const wallMaterial = new THREE.MeshPhongMaterial({
   color: 0x888888,
   emissive: 0x222222,
+  transparent: false,
+  opacity: 0,
 });
 const wallBoxes = [];
 const wallBodies = [];
 const spacing = 5;
 const wallWidth = 1;
 const wallHeight = 5;
-const wallDepth = 2;
+const wallDepth = 6;
 
 for (let i = 0; i <= roadLength; i += spacing) {
   const t = i / roadLength;
