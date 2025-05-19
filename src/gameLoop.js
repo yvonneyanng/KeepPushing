@@ -2,7 +2,7 @@ import { Car, setupCamera } from "./carControl.js";
 
 import { loadCarModel, updateCar } from "./car.js"
 
-export function initGame(scene, camera, renderer, world, wallBodies, ground) {
+export function initGame(scene, camera, renderer, world, ground) {
   // Create car
   // const car = new Car(scene);
   let carModel, carBody, carWrapper, carShaderMaterial;
@@ -58,7 +58,7 @@ export function initGame(scene, camera, renderer, world, wallBodies, ground) {
     requestAnimationFrame(animate);
 
     if (carBody && carWrapper) {
-      updateCar(carBody, carWrapper, window.vehicle, camera, wallBodies, world);
+      updateCar(carBody, carWrapper, window.vehicle, camera, world, renderer);
       
       const carX = carBody.position.x
       const carZ = carBody.position.z
