@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from 'cannon-es';
-import { roadMesh, wallBodies } from "./trackGeneration.js";
+import { roadMesh, planeGeometry } from "./trackGeneration.js";
 import { setupSky } from './skySceneSetup.js';
 import { createMovingGround } from "./groundSetup.js";
 
@@ -9,13 +9,6 @@ export function setupScene() {
     // 建立物理世界
   const world = new CANNON.World();
   world.gravity.set(0, -9.82, 0); // 重力往下
-console.log("wallBodies.length", wallBodies[10])
-wallBodies[1].position.y = 5
-  // 加入靜態跑道剛體
-  wallBodies.forEach((wallBody) => {
-    wallBody.position.y = 5
-  //   world.addBody(wallBody);
-  });
   
 
   const groundCANNONMaterial = new CANNON.Material();
@@ -27,6 +20,61 @@ wallBodies[1].position.y = 5
     material: groundCANNONMaterial,
   });
   world.addBody(groundBody);
+
+  function createTrimesh(geometry) {
+    const position = geometry.attributes.position;
+    const indices = geometry.index ? geometry.index.array : null;
+
+    const vertices = [];
+    for (let i = 0; i < position.count; i++) {
+      vertices.push(position.getX(i), position.getY(i), position.getZ(i));
+    }
+
+    const indicesArray = indices ? Array.from(indices) : [...Array(position.count).keys()];
+    return new CANNON.Trimesh(vertices, indicesArray);
+  }
+
+  const roadMaterial = new CANNON.Material('road');
+  const roadShape = createTrimesh(planeGeometry);
+  const roadBody = new CANNON.Body({
+    mass: 0,
+    material: roadMaterial,
+  });
+  roadBody.addShape(roadShape);
+  world.addBody(roadBody);
+
+  // Add collision listener for car and ground box
+  world.addEventListener('postStep', () => {
+    if (window.car?.carBody) {
+      world.contacts.forEach(contact => {
+        if (
+          (contact.bi === window.car.carBody && contact.bj === groundBody) ||
+          (contact.bj === window.car.carBody && contact.bi === groundBody)
+        ) {
+          console.log("YES");
+        }
+      });
+    }
+  });
+
+  world.addEventListener('postStep', () => {
+    const carBody = window.car?.carBody;
+    if (!carBody) return;
+
+    let touchingRoad = false;
+    world.contacts.forEach(contact => {
+      if (
+        (contact.bi === carBody && contact.bj === roadBody) ||
+        (contact.bj === carBody && contact.bi === roadBody)
+      ) {
+        touchingRoad = true;
+      }
+    });
+
+    if (touchingRoad) {
+      console.log("CAR TOUCHING ROAD");
+    }
+  });
 
   // Create scene
   const scene = new THREE.Scene();
@@ -77,23 +125,23 @@ wallBodies[1].position.y = 5
   // Add the road to the scene
   scene.add(roadMesh);
 
-  // 建立紅色球體的視覺模型
-  const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-  const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-  const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
-  ballMesh.castShadow = true;
-  ballMesh.receiveShadow = true;
-  ballMesh.position.set(0, 2, 2);
-  scene.add(ballMesh);
+  // // 建立紅色球體的視覺模型
+  // const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+  // const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  // const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
+  // ballMesh.castShadow = true;
+  // ballMesh.receiveShadow = true;
+  // ballMesh.position.set(0, 2, 2);
+  // scene.add(ballMesh);
 
-  // 建立紅色球體的物理剛體
-  const ballShape = new CANNON.Sphere(0.5);
-  const ballBody = new CANNON.Body({
-    mass: 1,
-    shape: ballShape,
-    position: new CANNON.Vec3(0, 2, -2),
-  });
-  world.addBody(ballBody);
+  // // 建立紅色球體的物理剛體
+  // const ballShape = new CANNON.Sphere(0.5);
+  // const ballBody = new CANNON.Body({
+  //   mass: 1,
+  //   shape: ballShape,
+  //   position: new CANNON.Vec3(0, 2, -2),
+  // });
+  // world.addBody(ballBody);
 
   // Create a dark ground plane
   const ground = createMovingGround(scene);
@@ -109,8 +157,8 @@ wallBodies[1].position.y = 5
   renderer.setAnimationLoop(() => {
     world.step(1 / 60);
 
-    ballMesh.position.copy(ballBody.position);
-    ballMesh.quaternion.copy(ballBody.quaternion);
+    // ballMesh.position.copy(ballBody.position);
+    // ballMesh.quaternion.copy(ballBody.quaternion);
 
     // Sync car visual with physics body (if car loaded)
     if (window.car) {
@@ -121,5 +169,5 @@ wallBodies[1].position.y = 5
     renderer.render(scene, camera);
   });
 
-  return { scene, camera, renderer, world, wallBodies, ground };
+  return { scene, camera, renderer, world, ground };
 }
