@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import * as CANNON from 'cannon-es';
 import { roadMesh, wallBodies } from "./trackGeneration.js";
+import { setupSky } from './skySceneSetup.js';
+import { createMovingGround } from "./groundSetup.js";
 
 export function setupScene() {
 
@@ -17,11 +19,11 @@ wallBodies[1].position.y = 5
   
 
   const groundCANNONMaterial = new CANNON.Material();
-  const groundShape = new CANNON.Box(new CANNON.Vec3(10000, 0.1, 10000));
+  const groundShape = new CANNON.Box(new CANNON.Vec3(1000000, 0.1, 1000000));
   const groundBody = new CANNON.Body({
     type: CANNON.Body.STATIC,
     shape: groundShape,
-    position: new CANNON.Vec3(0, -1, 0),
+    position: new CANNON.Vec3(0, 0, 0),
     material: groundCANNONMaterial,
   });
   world.addBody(groundBody);
@@ -60,6 +62,8 @@ wallBodies[1].position.y = 5
   directionalLight.shadow.mapSize.height = 1024;
   scene.add(directionalLight);
 
+  setupSky(scene, directionalLight);
+
   // Add spotlight to follow car
   const spotlight = new THREE.SpotLight(0xffffff, 1);
   spotlight.position.set(0, 10, 0);
@@ -92,16 +96,7 @@ wallBodies[1].position.y = 5
   world.addBody(ballBody);
 
   // Create a dark ground plane
-  const groundGeometry = new THREE.PlaneGeometry(200, 200);
-  const groundMaterial = new THREE.MeshPhongMaterial({
-    color: 0x111111, // Very dark gray
-    side: THREE.DoubleSide,
-  });
-  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-  ground.rotation.x = Math.PI / 2;
-  ground.position.y = -0.1;
-  ground.receiveShadow = true;
-  scene.add(ground);
+  const ground = createMovingGround(scene);
 
   // Handle window resize
   window.addEventListener("resize", () => {
@@ -126,5 +121,5 @@ wallBodies[1].position.y = 5
     renderer.render(scene, camera);
   });
 
-  return { scene, camera, renderer, world, wallBodies };
+  return { scene, camera, renderer, world, wallBodies, ground };
 }

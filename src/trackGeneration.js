@@ -100,7 +100,7 @@ planeGeometry.computeVertexNormals();
 const planeMaterial = new THREE.MeshPhongMaterial({
   color: 0x00ff00, // Green color
   transparent: true,
-  opacity: 0.2,
+  opacity: 1,
   side: THREE.DoubleSide,
   emissive: 0x003300,
 });
