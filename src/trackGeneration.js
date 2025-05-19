@@ -45,9 +45,12 @@ const roadGeometry = new THREE.TubeGeometry(
   false
 );
 const roadMaterial = new THREE.MeshPhongMaterial({
-  color: 0x222222, // Darker gray for road
+  color: 0x222222,
+  emissive: 0x111111,
+  transparent: true,
+  opacity: 0,
+  depthWrite: false,
   side: THREE.DoubleSide,
-  emissive: 0x111111, // Slight glow
 });
 
 // Create the road mesh
@@ -93,16 +96,27 @@ planeGeometry.setAttribute(
   "position",
   new THREE.Float32BufferAttribute(vertices, 3)
 );
+// Compute UVs for texture mapping
+const uvs = [];
+for (let i = 0; i < planePoints.length; i++) {
+  const u = (i % 2 === 0) ? 0 : 1;
+  const v = i / (planePoints.length - 2);
+  uvs.push(u, v);
+}
+planeGeometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 planeGeometry.setIndex(indices);
 planeGeometry.computeVertexNormals();
 
-// Create plane material
+// Create plane material with texture
+const textureLoader = new THREE.TextureLoader();
+const roadTexture = textureLoader.load('/textures/road.png');
+roadTexture.wrapS = THREE.RepeatWrapping;
+roadTexture.wrapT = THREE.RepeatWrapping;
+roadTexture.repeat.set(1, 50); // Adjust tiling to suit length of road
+
 const planeMaterial = new THREE.MeshPhongMaterial({
-  color: 0x00ff00, // Green color
-  transparent: true,
-  opacity: 0.2,
+  map: roadTexture,
   side: THREE.DoubleSide,
-  emissive: 0x003300,
 });
 
 // Create plane mesh
@@ -156,13 +170,15 @@ const wallCannonMaterial = new CANNON.Material('wall');
 const wallMaterial = new THREE.MeshPhongMaterial({
   color: 0x888888,
   emissive: 0x222222,
+  transparent: false,
+  opacity: 0,
 });
 const wallBoxes = [];
 const wallBodies = [];
 const spacing = 5;
 const wallWidth = 1;
 const wallHeight = 5;
-const wallDepth = 2;
+const wallDepth = 6;
 
 for (let i = 0; i <= roadLength; i += spacing) {
   const t = i / roadLength;

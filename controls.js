@@ -36,8 +36,8 @@ export function updateControls() {
   // 控制參數
   const engineForce = 1000;
   const brakeForce = 50; // 降低煞車力道
-  const maxSteer = 0.15; // radians
-  const maxSpeed = 20; // 自訂，例如 20 公尺/秒
+  const maxSteer = 0.30; // radians
+  const maxSpeed = 100; // 自訂，例如 20 公尺/秒
 
   const velocity = vehicle.chassisBody.velocity;
   const speed = velocity.length();

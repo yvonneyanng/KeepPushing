@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { updateControls } from '../controls';
+import { wallCannonMaterial } from './trackGeneration.js';
 
 export function loadCarModel(scene, world) {
   return new Promise((resolve) => {
@@ -80,18 +81,28 @@ export function loadCarModel(scene, world) {
 
       vehicle.addToWorld(world);
 
+      const wallContact = new CANNON.ContactMaterial(
+        carMaterial,
+        wallCannonMaterial,
+        {
+          friction: 0,
+          restitution: 1
+        }
+      );
+      world.addContactMaterial(wallContact);
+
       chassisBody.addEventListener('collide', (event) => {
         console.log("COLLIDE!!!");
         const otherBody = event.body;
         if (otherBody.material && otherBody.material.name === 'wall') {
           const relativeX = otherBody.position.x - chassisBody.position.x;
           const forceDirection = relativeX > 0 ? -1 : 1;
-          const forceMagnitude = 1000;
-          const force = new CANNON.Vec3(forceDirection * forceMagnitude, 0, 1000);
-          chassisBody.applyForce(force, chassisBody.position);
+          // const forceMagnitude = 1000;
+          // const force = new CANNON.Vec3(forceDirection * forceMagnitude, 0, 1000);
+          // chassisBody.applyForce(force, chassisBody.position);
 
           // Also move the car slightly to separate it from the wall
-          const bounceOffset = new CANNON.Vec3(forceDirection * 0.3, 0, 0);
+          const bounceOffset = new CANNON.Vec3(forceDirection * 0.03, 0, 0);
           chassisBody.position.vadd(bounceOffset, chassisBody.position);
         }
       });
@@ -149,7 +160,7 @@ export function updateCar(carBody, carWrapper, vehicle, camera, wallBodies, worl
   // }
 
   updateControls(carBody);
-  const offset = new THREE.Vector3(0, 5, 10);
+  const offset = new THREE.Vector3(0, 3, 10);
   offset.applyQuaternion(carWrapper.quaternion);
   const carPos = new THREE.Vector3(carBody.position.x, carBody.position.y, carBody.position.z);
   camera.lookAt(carPos);

@@ -2,7 +2,7 @@ import { Car, setupCamera } from "./carControl.js";
 
 import { loadCarModel, updateCar } from "./car.js"
 
-export function initGame(scene, camera, renderer, world, wallBodies) {
+export function initGame(scene, camera, renderer, world, wallBodies, ground) {
   // Create car
   // const car = new Car(scene);
   let carModel, carBody, carWrapper, carShaderMaterial;
@@ -59,6 +59,18 @@ export function initGame(scene, camera, renderer, world, wallBodies) {
 
     if (carBody && carWrapper) {
       updateCar(carBody, carWrapper, window.vehicle, camera, wallBodies, world);
+      
+      const carX = carBody.position.x
+      const carZ = carBody.position.z
+      const groundX = ground.position.x
+      const groundZ = ground.position.z
+
+      const Limit = ground.size / 2 - ground.relocateOffSet
+      if (Math.abs(carX - groundX) >= Limit  || Math.abs(carZ - groundZ) >= Limit) {
+
+        ground.position.set(carX, -0.1, carZ)
+      }
+      // console.log(ground)
     }
     // // Handle steering
     // if (keys.ArrowLeft) car.steer(-1);
