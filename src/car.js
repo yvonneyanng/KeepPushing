@@ -1,16 +1,41 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { updateControls } from '../controls';
-import { wallCannonMaterial } from './trackGeneration.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+const textureLoader = new THREE.TextureLoader();
+import { updateControls } from './controls.js';
+import { curve, roadWidth } from './trackGeneration.js';
 
 export function loadCarModel(scene, world) {
   return new Promise((resolve) => {
-    const loader = new GLTFLoader();
-    loader.load('models/car.glb', (gltf) => {
+    const baseColorMap = textureLoader.load('models/car/Detomasop72_Base_Color.png');
+    const normalMap = textureLoader.load('models/car/Detomasop72_Normal_OpenGL.png');
+    const roughnessMap = textureLoader.load('models/car/Detomasop72_Roughness.png');
+    const metalnessMap = textureLoader.load('models/car/Detomasop72_Metallic.png');
+
+    const visualMaterial = new THREE.MeshStandardMaterial({
+      map: baseColorMap,
+      normalMap: normalMap,
+      roughnessMap: roughnessMap,
+      metalnessMap: metalnessMap,
+      metalness: 1,
+      roughness: 1,
+    });
+
+    const loader = new OBJLoader();
+    loader.load('models/car/FullBody.obj', (object) => {
       const carMaterial = new CANNON.Material('car');
-      const carModel = gltf.scene;
-      // carModel.scale.set(0.2, 0.2, 0.2)
+
+      object.traverse((child) => {
+        if (child.isMesh) {
+          child.material = visualMaterial;
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      const carModel = object;
+      carModel.scale.set(0.0015, 0.0015, 0.0015)
       const box = new THREE.Box3().setFromObject(carModel);
       const size = new THREE.Vector3();
       box.getSize(size);
@@ -30,13 +55,13 @@ export function loadCarModel(scene, world) {
         (size.z / 2) * fudge
       ));
       const chassisBody = new CANNON.Body({
-        mass: 600,
+        mass: 300,
         shape: chassisShape,
         position: new CANNON.Vec3(0, (size.y / 2) * fudge + 0.2, 0),
         material: carMaterial,
       });
       chassisBody.linearDamping = 0.02;
-      chassisBody.angularDamping = 0.5;
+      chassisBody.angularDamping = 1;
       // vehicle.chassisBody.ccdSpeedThreshold = 1;
       // vehicle.chassisBody.ccdIterations = 10;
 
@@ -81,16 +106,6 @@ export function loadCarModel(scene, world) {
 
       vehicle.addToWorld(world);
 
-      const wallContact = new CANNON.ContactMaterial(
-        carMaterial,
-        wallCannonMaterial,
-        {
-          friction: 0,
-          restitution: 1
-        }
-      );
-      world.addContactMaterial(wallContact);
-
       chassisBody.addEventListener('collide', (event) => {
         console.log("COLLIDE!!!");
         const otherBody = event.body;
@@ -112,18 +127,16 @@ export function loadCarModel(scene, world) {
   });
 }
 
-export function updateCar(carBody, carWrapper, vehicle, camera, wallBodies, world, gridSize, cellSize, spawnedCells, scene, balls, groundMat, guiSettings) {
+export function updateCar(carBody, carWrapper, vehicle, camera, world, gridSize, cellSize, spawnedCells, scene, balls, groundMat, guiSettings) {
+  // if (!window.controls && camera && renderer) {
+  //   window.controls = new OrbitControls(camera, renderer.domElement);
+  //   window.controls.target.copy(carBody.position);
+  //   window.controls.update();
+  // }
+
   carWrapper.position.copy(carBody.position);
   carWrapper.quaternion.copy(carBody.quaternion);
 
-  wallBodies.forEach(wallBody => {
-    const x = (wallBody.position.x - carWrapper.position.x)
-    const z = (wallBody.position.z - carWrapper.position.z)
-    const distance = Math.sqrt(x**2 + z**2)
-    if (distance < 20) {
-      world.addBody(wallBody)
-    }
-  })
   // if (window.debugBox) {
   //   debugBox.position.copy(carBody.position);
   //   debugBox.quaternion.copy(carBody.quaternion);
@@ -160,7 +173,7 @@ export function updateCar(carBody, carWrapper, vehicle, camera, wallBodies, worl
   // }
 
   updateControls(carBody);
-  const offset = new THREE.Vector3(0, 3, 10);
+  const offset = new THREE.Vector3(0, 3, 8);
   offset.applyQuaternion(carWrapper.quaternion);
   const carPos = new THREE.Vector3(carBody.position.x, carBody.position.y, carBody.position.z);
   camera.lookAt(carPos);
@@ -174,4 +187,33 @@ export function updateCar(carBody, carWrapper, vehicle, camera, wallBodies, worl
   //     groundMat.uniforms.uTriggered.value = false;
   //   }
   // }
+
+  if (window.controls) {
+    window.controls.target.copy(carBody.position);
+    window.controls.update();
+  }
+
+  // 判斷車子是否偏離跑道
+  const carPos2D = new THREE.Vector2(carBody.position.x, carBody.position.z);
+  let closestDist = Infinity;
+
+  for (let t = 0; t <= 1; t += 0.001) {
+    const point = curve.getPointAt(t);
+    const point2D = new THREE.Vector2(point.x, point.z);
+    const dist = carPos2D.distanceTo(point2D);
+    if (dist < closestDist) {
+      closestDist = dist;
+    }
+  }
+
+  const maxDistance = roadWidth / 2;
+  if (closestDist > maxDistance) {
+    console.log("🚧 車子在跑道外");
+    if (vehicle.maxSpeedRate > 0.05) {
+        vehicle.maxSpeedRate *= 0.98
+      }
+  } else {
+    console.log("✅ 車子在跑道上");
+    vehicle.maxSpeedRate = 1;
+  }
 }
