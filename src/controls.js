@@ -28,6 +28,20 @@ document.addEventListener('keyup', (e) => {
   if (e.code === 'KeyD') turnRight = false;
   if (e.code === 'Space') brake = false;
 });
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'ArrowUp') moveForward = true;
+  if (e.code === 'ArrowDown') moveBackward = true;
+  if (e.code === 'ArrowLeft') turnLeft = true;
+  if (e.code === 'ArrowRight') turnRight = true;
+  if (e.code === 'Space') brake = true;
+});
+document.addEventListener('keyup', (e) => {
+  if (e.code === 'ArrowUp') moveForward = false;
+  if (e.code === 'ArrowDown') moveBackward = false;
+  if (e.code === 'ArrowLeft') turnLeft = false;
+  if (e.code === 'ArrowRight') turnRight = false;
+  if (e.code === 'Space') brake = false;
+});
 
 export function updateControls() {
   const vehicle = getVehicle();
