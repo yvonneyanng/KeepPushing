@@ -1,23 +1,29 @@
 import { Car, setupCamera } from "./carControl.js";
 
-import { loadCarModel, updateCar } from "./car.js"
+import { loadCarModel, updateCar } from "./car.js";
+import { UIFinish } from "./uiFinish.js";
+import { curve } from "./trackGeneration.js";
 
 export function initGame(scene, camera, renderer, world, ground) {
   // Create car
   // const car = new Car(scene);
   let carModel, carBody, carWrapper, carShaderMaterial;
 
-  loadCarModel(scene, world)
-  .then(({ carModel: loadedCarModel, carWrapper: loadedCarWrapper, carBody: loadedCarBody, vehicle }) => {
-    carModel = loadedCarModel;
-    carWrapper = loadedCarWrapper;
-    carBody = loadedCarBody;
-    // For controls.js to access the vehicle
-    window.vehicle = vehicle;
-    // Optionally, set up wheelMeshes or other car-specific logic here
-  });
-
-  
+  loadCarModel(scene, world).then(
+    ({
+      carModel: loadedCarModel,
+      carWrapper: loadedCarWrapper,
+      carBody: loadedCarBody,
+      vehicle,
+    }) => {
+      carModel = loadedCarModel;
+      carWrapper = loadedCarWrapper;
+      carBody = loadedCarBody;
+      // For controls.js to access the vehicle
+      window.vehicle = vehicle;
+      // Optionally, set up wheelMeshes or other car-specific logic here
+    }
+  );
 
   // // Setup camera to follow car
   // const updateCamera = setupCamera(camera, car);
@@ -53,24 +59,64 @@ export function initGame(scene, camera, renderer, world, ground) {
   //   }
   // });
 
-  // Animation loop
+  window.uiFinish = new UIFinish();
+  let finished = false;
   function animate() {
     requestAnimationFrame(animate);
 
     if (carBody && carWrapper) {
       updateCar(carBody, carWrapper, window.vehicle, camera, world, renderer);
-      
-      const carX = carBody.position.x
-      const carZ = carBody.position.z
-      const groundX = ground.position.x
-      const groundZ = ground.position.z
 
-      const Limit = ground.size / 2 - ground.relocateOffSet
-      if (Math.abs(carX - groundX) >= Limit  || Math.abs(carZ - groundZ) >= Limit) {
+      const carX = carBody.position.x;
+      const carZ = carBody.position.z;
+      const groundX = ground.position.x;
+      const groundZ = ground.position.z;
 
-        ground.position.set(carX, -0.1, carZ)
+      const Limit = ground.size / 2 - ground.relocateOffSet;
+      if (
+        Math.abs(carX - groundX) >= Limit ||
+        Math.abs(carZ - groundZ) >= Limit
+      ) {
+        ground.position.set(carX, -0.1, carZ);
       }
       // console.log(ground)
+
+      if (window.uiProgress && carBody) {
+        const speed = carBody.velocity.length();
+        const speedKmh = speed * 3.6;
+        window.uiProgress.update(speedKmh);
+      }
+      if (
+        !finished &&
+        window.vehicle &&
+        window.vehicle.chassisBody &&
+        carWrapper.position
+      ) {
+        const finishPoint = curve.getPointAt(1);
+        const carPos = carWrapper.position;
+        const finishDist = carPos.distanceTo(finishPoint);
+        if (finishDist < 10) {
+          finished = true;
+          if (window.gameTimer) window.gameTimer.stop();
+          if (window.vehicle) {
+            for (let i = 0; i < window.vehicle.wheelInfos.length; i++) {
+              window.vehicle.setBrake(1e6, i);
+            }
+            window.vehicle.applyEngineForce(0, 0);
+            window.vehicle.applyEngineForce(0, 1);
+            window.vehicle.applyEngineForce(0, 2);
+            window.vehicle.applyEngineForce(0, 3);
+          }
+          if (carBody) {
+            carBody.velocity.set(0, 0, 0);
+            carBody.angularVelocity.set(0, 0, 0);
+          }
+          const timeString = window.gameTimer
+            ? window.gameTimer.formatTime(window.gameTimer.getCurrentTime())
+            : "--:--:--";
+          if (window.uiFinish) window.uiFinish.show(timeString);
+        }
+      }
     }
     // // Handle steering
     // if (keys.ArrowLeft) car.steer(-1);

@@ -1,17 +1,25 @@
-import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from "three";
+import * as CANNON from "cannon-es";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 const textureLoader = new THREE.TextureLoader();
-import { updateControls } from './controls.js';
-import { curve, roadWidth } from './trackGeneration.js';
+import { updateControls } from "./controls.js";
+import { curve, roadWidth } from "./trackGeneration.js";
 
 export function loadCarModel(scene, world) {
   return new Promise((resolve) => {
-    const baseColorMap = textureLoader.load('models/car/Detomasop72_Base_Color.png');
-    const normalMap = textureLoader.load('models/car/Detomasop72_Normal_OpenGL.png');
-    const roughnessMap = textureLoader.load('models/car/Detomasop72_Roughness.png');
-    const metalnessMap = textureLoader.load('models/car/Detomasop72_Metallic.png');
+    const baseColorMap = textureLoader.load(
+      "models/car/Detomasop72_Base_Color.png"
+    );
+    const normalMap = textureLoader.load(
+      "models/car/Detomasop72_Normal_OpenGL.png"
+    );
+    const roughnessMap = textureLoader.load(
+      "models/car/Detomasop72_Roughness.png"
+    );
+    const metalnessMap = textureLoader.load(
+      "models/car/Detomasop72_Metallic.png"
+    );
 
     const visualMaterial = new THREE.MeshStandardMaterial({
       map: baseColorMap,
@@ -23,8 +31,8 @@ export function loadCarModel(scene, world) {
     });
 
     const loader = new OBJLoader();
-    loader.load('models/car/FullBody.obj', (object) => {
-      const carMaterial = new CANNON.Material('car');
+    loader.load("models/car/FullBody.obj", (object) => {
+      const carMaterial = new CANNON.Material("car");
 
       object.traverse((child) => {
         if (child.isMesh) {
@@ -35,25 +43,32 @@ export function loadCarModel(scene, world) {
       });
 
       const carModel = object;
-      carModel.scale.set(0.0015, 0.0015, 0.0015)
+      carModel.scale.set(0.0015, 0.0015, 0.0015);
       const box = new THREE.Box3().setFromObject(carModel);
       const size = new THREE.Vector3();
       box.getSize(size);
       const center = new THREE.Vector3();
       box.getCenter(center);
-      carModel.position.y -= (center.y - box.min.y);
+      carModel.position.y -= center.y - box.min.y;
       carModel.rotation.y = Math.PI;
 
       const carWrapper = new THREE.Object3D();
       carWrapper.add(carModel);
       scene.add(carWrapper);
 
+      // Align carWrapper with the road's tangent at the start
+      const startTangent = curve.getTangentAt(0);
+      const angle = Math.atan2(startTangent.x, startTangent.z);
+      carWrapper.rotation.y = angle;
+
       const fudge = 1;
-      const chassisShape = new CANNON.Box(new CANNON.Vec3(
-        (size.x / 2) * fudge,
-        (size.y / 2) * fudge,
-        (size.z / 2) * fudge
-      ));
+      const chassisShape = new CANNON.Box(
+        new CANNON.Vec3(
+          (size.x / 2) * fudge,
+          (size.y / 2) * fudge,
+          (size.z / 2) * fudge
+        )
+      );
       const chassisBody = new CANNON.Body({
         mass: 300,
         shape: chassisShape,
@@ -89,27 +104,27 @@ export function loadCarModel(scene, world) {
         chassisConnectionPointLocal: new CANNON.Vec3(),
         maxSuspensionTravel: 0.3,
         customSlidingRotationalSpeed: -30,
-        useCustomSlidingRotationalSpeed: true
+        useCustomSlidingRotationalSpeed: true,
       };
 
       const wheelPositions = [
-        new CANNON.Vec3(-halfW, yWheel,  halfL),
-        new CANNON.Vec3( halfW, yWheel,  halfL),
+        new CANNON.Vec3(-halfW, yWheel, halfL),
+        new CANNON.Vec3(halfW, yWheel, halfL),
         new CANNON.Vec3(-halfW, yWheel, -halfL),
-        new CANNON.Vec3( halfW, yWheel, -halfL),
+        new CANNON.Vec3(halfW, yWheel, -halfL),
       ];
 
-      wheelPositions.forEach(pos => {
+      wheelPositions.forEach((pos) => {
         wheelOptions.chassisConnectionPointLocal.copy(pos);
         vehicle.addWheel(wheelOptions);
       });
 
       vehicle.addToWorld(world);
 
-      chassisBody.addEventListener('collide', (event) => {
+      chassisBody.addEventListener("collide", (event) => {
         console.log("COLLIDE!!!");
         const otherBody = event.body;
-        if (otherBody.material && otherBody.material.name === 'wall') {
+        if (otherBody.material && otherBody.material.name === "wall") {
           const relativeX = otherBody.position.x - chassisBody.position.x;
           const forceDirection = relativeX > 0 ? -1 : 1;
           // const forceMagnitude = 1000;
@@ -127,7 +142,20 @@ export function loadCarModel(scene, world) {
   });
 }
 
-export function updateCar(carBody, carWrapper, vehicle, camera, world, gridSize, cellSize, spawnedCells, scene, balls, groundMat, guiSettings) {
+export function updateCar(
+  carBody,
+  carWrapper,
+  vehicle,
+  camera,
+  world,
+  gridSize,
+  cellSize,
+  spawnedCells,
+  scene,
+  balls,
+  groundMat,
+  guiSettings
+) {
   // if (!window.controls && camera && renderer) {
   //   window.controls = new OrbitControls(camera, renderer.domElement);
   //   window.controls.target.copy(carBody.position);
@@ -175,7 +203,11 @@ export function updateCar(carBody, carWrapper, vehicle, camera, world, gridSize,
   updateControls(carBody);
   const offset = new THREE.Vector3(0, 3, 8);
   offset.applyQuaternion(carWrapper.quaternion);
-  const carPos = new THREE.Vector3(carBody.position.x, carBody.position.y, carBody.position.z);
+  const carPos = new THREE.Vector3(
+    carBody.position.x,
+    carBody.position.y,
+    carBody.position.z
+  );
   camera.lookAt(carPos);
 
   // camera.position.lerp(carPos, 0.08);
@@ -210,8 +242,8 @@ export function updateCar(carBody, carWrapper, vehicle, camera, world, gridSize,
   if (closestDist > maxDistance) {
     console.log("🚧 車子在跑道外");
     if (vehicle.maxSpeedRate > 0.05) {
-        vehicle.maxSpeedRate *= 0.98
-      }
+      vehicle.maxSpeedRate *= 0.98;
+    }
   } else {
     console.log("✅ 車子在跑道上");
     vehicle.maxSpeedRate = 1;

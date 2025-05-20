@@ -1,5 +1,5 @@
-import * as CANNON from 'cannon-es';
-import * as THREE from 'three';
+import * as CANNON from "cannon-es";
+import * as THREE from "three";
 
 const getVehicle = () => window.vehicle;
 
@@ -14,33 +14,37 @@ let turnLeft = false;
 let turnRight = false;
 let brake = false;
 
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'KeyW') moveForward = true;
-  if (e.code === 'KeyS') moveBackward = true;
-  if (e.code === 'KeyA') turnLeft = true;
-  if (e.code === 'KeyD') turnRight = true;
-  if (e.code === 'Space') brake = true;
+document.addEventListener("keydown", (e) => {
+  if (!window.isGamePlaying) return;
+  if (e.code === "KeyW") moveForward = true;
+  if (e.code === "KeyS") moveBackward = true;
+  if (e.code === "KeyA") turnLeft = true;
+  if (e.code === "KeyD") turnRight = true;
+  if (e.code === "Space") brake = true;
 });
-document.addEventListener('keyup', (e) => {
-  if (e.code === 'KeyW') moveForward = false;
-  if (e.code === 'KeyS') moveBackward = false;
-  if (e.code === 'KeyA') turnLeft = false;
-  if (e.code === 'KeyD') turnRight = false;
-  if (e.code === 'Space') brake = false;
+document.addEventListener("keyup", (e) => {
+  if (!window.isGamePlaying) return;
+  if (e.code === "KeyW") moveForward = false;
+  if (e.code === "KeyS") moveBackward = false;
+  if (e.code === "KeyA") turnLeft = false;
+  if (e.code === "KeyD") turnRight = false;
+  if (e.code === "Space") brake = false;
 });
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'ArrowUp') moveForward = true;
-  if (e.code === 'ArrowDown') moveBackward = true;
-  if (e.code === 'ArrowLeft') turnLeft = true;
-  if (e.code === 'ArrowRight') turnRight = true;
-  if (e.code === 'Space') brake = true;
+document.addEventListener("keydown", (e) => {
+  if (!window.isGamePlaying) return;
+  if (e.code === "ArrowUp") moveForward = true;
+  if (e.code === "ArrowDown") moveBackward = true;
+  if (e.code === "ArrowLeft") turnLeft = true;
+  if (e.code === "ArrowRight") turnRight = true;
+  if (e.code === "Space") brake = true;
 });
-document.addEventListener('keyup', (e) => {
-  if (e.code === 'ArrowUp') moveForward = false;
-  if (e.code === 'ArrowDown') moveBackward = false;
-  if (e.code === 'ArrowLeft') turnLeft = false;
-  if (e.code === 'ArrowRight') turnRight = false;
-  if (e.code === 'Space') brake = false;
+document.addEventListener("keyup", (e) => {
+  if (!window.isGamePlaying) return;
+  if (e.code === "ArrowUp") moveForward = false;
+  if (e.code === "ArrowDown") moveBackward = false;
+  if (e.code === "ArrowLeft") turnLeft = false;
+  if (e.code === "ArrowRight") turnRight = false;
+  if (e.code === "Space") brake = false;
 });
 
 export function updateControls() {
@@ -56,9 +60,9 @@ export function updateControls() {
   const velocity = vehicle.chassisBody.velocity;
   const speed = velocity.length();
 
-  const maxV = maxSpeed * vehicle.maxSpeedRate
+  const maxV = maxSpeed * vehicle.maxSpeedRate;
 
-  console.log('MaxV', maxV)
+  console.log("MaxV", maxV);
 
   if (speed > maxV) {
     // 限速：將速度方向保留，但長度縮成 maxSpeed
@@ -82,8 +86,6 @@ export function updateControls() {
       vehicle.applyEngineForce(0, 3);
     }
   }
-
-  
 
   // Space 煞車
   if (brake) {

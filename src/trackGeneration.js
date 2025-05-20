@@ -1,4 +1,4 @@
-import * as CANNON from 'cannon-es';
+import * as CANNON from "cannon-es";
 import * as THREE from "three";
 
 // Create a curved road
@@ -57,6 +57,11 @@ const roadMaterial = new THREE.MeshPhongMaterial({
 const roadMesh = new THREE.Mesh(roadGeometry, roadMaterial);
 roadMesh.receiveShadow = true;
 
+// Align the road so the start points down -Z (align with car/camera)
+// const startTangent = curve.getTangentAt(0);
+// const angle = Math.atan2(startTangent.x, startTangent.z);
+// roadMesh.rotation.y = -angle + Math.PI;
+
 // Create horizontal plane that follows the curve
 const planePoints = [];
 const planeWidth = 20; // Width of the horizontal plane
@@ -99,17 +104,17 @@ planeGeometry.setAttribute(
 // Compute UVs for texture mapping
 const uvs = [];
 for (let i = 0; i < planePoints.length; i++) {
-  const u = (i % 2 === 0) ? 0 : 1;
+  const u = i % 2 === 0 ? 0 : 1;
   const v = i / (planePoints.length - 2);
   uvs.push(u, v);
 }
-planeGeometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+planeGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
 planeGeometry.setIndex(indices);
 planeGeometry.computeVertexNormals();
 
 // Create plane material with texture
 const textureLoader = new THREE.TextureLoader();
-const roadTexture = textureLoader.load('/textures/road.png');
+const roadTexture = textureLoader.load("/textures/road.png");
 roadTexture.wrapS = THREE.RepeatWrapping;
 roadTexture.wrapT = THREE.RepeatWrapping;
 roadTexture.repeat.set(1, 50); // Adjust tiling to suit length of road
@@ -151,7 +156,6 @@ for (let i = 1; i <= 10; i++) {
 
 // Convert geometry to Cannon-es Trimesh shape
 function createTrimesh(geometry) {
-
   const position = geometry.attributes.position;
   const indices = geometry.index ? geometry.index.array : null;
 
@@ -160,7 +164,9 @@ function createTrimesh(geometry) {
     vertices.push(position.getX(i), position.getY(i), position.getZ(i));
   }
 
-  const indicesArray = indices ? Array.from(indices) : [...Array(position.count).keys()];
+  const indicesArray = indices
+    ? Array.from(indices)
+    : [...Array(position.count).keys()];
 
   return new CANNON.Trimesh(vertices, indicesArray);
 }
