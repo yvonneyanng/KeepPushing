@@ -8,7 +8,6 @@ export class Block1 {
     this.curve = curve;
     this.scene = scene;
     this.world = world;
-    this.blocks = [];
     this.allBlocks = {}
     this.model = null;
     this.size = new THREE.Vector3();
@@ -98,7 +97,6 @@ export class Block1 {
     //   wireframe.quaternion.copy(body.quaternion);
     // });
 
-    this.blocks.push({ mesh: blockMesh, body });
     this.allBlocks[t] = { mesh: blockMesh, body }
 
     this.world.addEventListener('postStep', () => {
@@ -107,17 +105,12 @@ export class Block1 {
     });
   }
 
-  removeBlock(index) {
-    const { mesh, body } = this.blocks[index];
-    this.scene.remove(mesh);
-    this.world.removeBody(body);
-    this.blocks.splice(index, 1);
-  }
-
   removeBlockAtT(t) {
-    const { mesh, body } = this.allBlocks[t];
-    this.scene.remove(mesh);
-    this.world.removeBody(body);
-    this.allBlocks[t] = null;
+    if (this.allBlocks[t]) {
+      const { mesh, body } = this.allBlocks[t];
+      this.scene.remove(mesh);
+      this.world.removeBody(body);
+      this.allBlocks[t] = null;
+    }
   }
 }

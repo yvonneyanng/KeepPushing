@@ -279,6 +279,10 @@ export function updateCar(
     if (dist < blockMakingDistance && willMakeABlock && t2 >= 0.02) {
       block1.createBlock(t2)
     }
+
+    if (dist > blockRemovingDistance) {
+      block1.removeBlockAtT(t2)
+    }
   }
 
   const maxDistance = roadWidth / 2;
