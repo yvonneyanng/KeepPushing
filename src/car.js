@@ -6,6 +6,10 @@ const textureLoader = new THREE.TextureLoader();
 import { updateControls } from "./controls.js";
 import { curve, roadWidth } from "./trackGeneration.js";
 
+import { Block1 } from "./block1.js";
+
+const blockMakingDistance = 100;
+const blockRemovingDistance = 1000;
 export function loadCarModel(scene, world) {
   return new Promise((resolve) => {
     const baseColorMap = textureLoader.load(
@@ -81,11 +85,36 @@ export function loadCarModel(scene, world) {
         ),
         material: carMaterial,
       });
+      chassisBody.ccdSpeedThreshold = 1;
+      chassisBody.ccdIterations = 10;
       chassisBody.quaternion.setFromEuler(0, angle + Math.PI, 0);
       chassisBody.linearDamping = 0.02;
       chassisBody.angularDamping = 1;
       // vehicle.chassisBody.ccdSpeedThreshold = 1;
       // vehicle.chassisBody.ccdIterations = 10;
+
+      // // --- Debug wireframe for car collision box ---
+      // const wireframe = new THREE.Mesh(
+      //   new THREE.BoxGeometry(
+      //     (size.x / 2) * fudge * 2,
+      //     (size.y / 2) * fudge * 2,
+      //     (size.z / 2) * fudge * 2
+      //   ),
+      //   new THREE.MeshBasicMaterial({
+      //     wireframe: true,
+      //     color: 0xff00ff
+      //   })
+      // );
+      // wireframe.position.copy(chassisBody.position);
+      // wireframe.quaternion.copy(chassisBody.quaternion);
+      // scene.add(wireframe);
+
+      // // Update wireframe position in animation loop
+      // world.addEventListener('postStep', () => {
+      //   wireframe.position.copy(chassisBody.position);
+      //   wireframe.quaternion.copy(chassisBody.quaternion);
+      // });
+
 
       const vehicle = new CANNON.RaycastVehicle({
         chassisBody: chassisBody,
@@ -153,6 +182,7 @@ export function updateCar(
   carWrapper,
   vehicle,
   camera,
+  block1,
   world,
   gridSize,
   cellSize,
@@ -242,11 +272,18 @@ export function updateCar(
     if (dist < closestDist) {
       closestDist = dist;
     }
+
+    // make the block1
+    const t2 = Math.floor(t * 1000) / 1000
+    const willMakeABlock = (t2 * 1000) % 10 == 0
+    if (dist < blockMakingDistance && willMakeABlock && t2 >= 0.02) {
+      block1.createBlock(t2)
+    }
   }
 
   const maxDistance = roadWidth / 2;
   if (closestDist > maxDistance) {
-    if (vehicle.maxSpeedRate > 0.05) {
+    if (vehicle.maxSpeedRate > 0.1) {
       vehicle.maxSpeedRate *= 0.98;
     }
   } else {
