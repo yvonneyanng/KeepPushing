@@ -6,17 +6,15 @@ import { UIProgress } from "./src/uiProgress.js";
 import { UICountdown } from "./src/uiCountdown.js";
 
 window.isGamePlaying = false;
+
 class Game {
   constructor() {
     this.isPlaying = false;
-
     // 初始化核心系統
     this.timer = new GameTimer();
     window.gameTimer = this.timer;
     this.uiProgress = new UIProgress(this.carControl);
     this.initUI();
-    this.startingAudioPath = "/sounds/StartingSound.mp3";
-
     window.uiProgress = this.uiProgress;
   }
 
@@ -26,10 +24,8 @@ class Game {
     });
   }
 
-  // not working yet
-  playStartingAudio() {
-    const startingAudio = new Audio(this.startingAudioPath);
-    startingAudio.play();
+  showStartScreen() {
+    this.uiStart.show();
   }
 
   startCountdown() {
@@ -38,17 +34,14 @@ class Game {
       window.isGamePlaying = true;
       this.startGame();
     });
-    this.uiCountdown.start(5);
+    this.uiCountdown.start(3);
   }
 
   startGame() {
     if (this.isPlaying) return;
-
     this.isPlaying = true;
-
     // 啟動計時器
     this.timer.start();
-
     // 顯示賽車儀表
     this.uiProgress.show();
   }
@@ -62,3 +55,5 @@ const { scene, camera, renderer, world, ground } = setupScene();
 
 // Start the game
 initGame(scene, camera, renderer, world, ground);
+
+game.showStartScreen();

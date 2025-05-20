@@ -45,7 +45,7 @@ export class UICountdown {
 
   playBeep() {
     const beep = new Audio(this.beepAudioPath);
-    beep.currentTime = 0.5; // Skip the first 0.5 seconds
+    beep.currentTime = 2.5; // Skip the first 0.5 seconds
     beep.play();
   }
 
