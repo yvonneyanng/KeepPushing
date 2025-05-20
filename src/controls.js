@@ -15,7 +15,7 @@ let turnRight = false;
 let brake = false;
 
 document.addEventListener("keydown", (e) => {
-  if (!window.isGamePlaying) return;
+  if (!window.isGamePlaying || window.isGameFinished) return;
   if (e.code === "KeyW") moveForward = true;
   if (e.code === "KeyS") moveBackward = true;
   if (e.code === "KeyA") turnLeft = true;
@@ -23,7 +23,7 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "Space") brake = true;
 });
 document.addEventListener("keyup", (e) => {
-  if (!window.isGamePlaying) return;
+  if (!window.isGamePlaying || window.isGameFinished) return;
   if (e.code === "KeyW") moveForward = false;
   if (e.code === "KeyS") moveBackward = false;
   if (e.code === "KeyA") turnLeft = false;
@@ -31,7 +31,7 @@ document.addEventListener("keyup", (e) => {
   if (e.code === "Space") brake = false;
 });
 document.addEventListener("keydown", (e) => {
-  if (!window.isGamePlaying) return;
+  if (!window.isGamePlaying || window.isGameFinished) return;
   if (e.code === "ArrowUp") moveForward = true;
   if (e.code === "ArrowDown") moveBackward = true;
   if (e.code === "ArrowLeft") turnLeft = true;
@@ -39,7 +39,7 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "Space") brake = true;
 });
 document.addEventListener("keyup", (e) => {
-  if (!window.isGamePlaying) return;
+  if (!window.isGamePlaying || window.isGameFinished) return;
   if (e.code === "ArrowUp") moveForward = false;
   if (e.code === "ArrowDown") moveBackward = false;
   if (e.code === "ArrowLeft") turnLeft = false;
@@ -61,8 +61,6 @@ export function updateControls() {
   const speed = velocity.length();
 
   const maxV = maxSpeed * vehicle.maxSpeedRate;
-
-  console.log("MaxV", maxV);
 
   if (speed > maxV) {
     // 限速：將速度方向保留，但長度縮成 maxSpeed

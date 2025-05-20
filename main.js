@@ -15,6 +15,7 @@ class Game {
     window.gameTimer = this.timer;
     this.uiProgress = new UIProgress(this.carControl);
     this.initUI();
+    this.startingAudioPath = "/sounds/StartingSound.mp3";
 
     window.uiProgress = this.uiProgress;
   }
@@ -25,30 +26,31 @@ class Game {
     });
   }
 
+  // not working yet
+  playStartingAudio() {
+    const startingAudio = new Audio(this.startingAudioPath);
+    startingAudio.play();
+  }
+
   startCountdown() {
     window.isGamePlaying = false;
     this.uiCountdown = new UICountdown(() => {
       window.isGamePlaying = true;
       this.startGame();
     });
-    this.uiCountdown.start(5); // 3-second countdown
+    this.uiCountdown.start(5);
   }
 
   startGame() {
     if (this.isPlaying) return;
 
     this.isPlaying = true;
-    console.log("GAME START");
 
     // 啟動計時器
     this.timer.start();
 
     // 顯示賽車儀表
     this.uiProgress.show();
-
-    // 初始化遊戲核心邏輯
-    this.gameLoop = new GameLoop();
-    this.gameLoop.start();
   }
 }
 

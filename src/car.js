@@ -122,7 +122,6 @@ export function loadCarModel(scene, world) {
       vehicle.addToWorld(world);
 
       chassisBody.addEventListener("collide", (event) => {
-        console.log("COLLIDE!!!");
         const otherBody = event.body;
         if (otherBody.material && otherBody.material.name === "wall") {
           const relativeX = otherBody.position.x - chassisBody.position.x;
@@ -240,12 +239,10 @@ export function updateCar(
 
   const maxDistance = roadWidth / 2;
   if (closestDist > maxDistance) {
-    console.log("🚧 車子在跑道外");
     if (vehicle.maxSpeedRate > 0.05) {
       vehicle.maxSpeedRate *= 0.98;
     }
   } else {
-    console.log("✅ 車子在跑道上");
     vehicle.maxSpeedRate = 1;
   }
 }

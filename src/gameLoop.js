@@ -61,6 +61,7 @@ export function initGame(scene, camera, renderer, world, ground) {
 
   window.uiFinish = new UIFinish();
   let finished = false;
+  window.isGameFinished = false; // Reset finish flag at game start
   function animate() {
     requestAnimationFrame(animate);
 
@@ -79,7 +80,6 @@ export function initGame(scene, camera, renderer, world, ground) {
       ) {
         ground.position.set(carX, -0.1, carZ);
       }
-      // console.log(ground)
 
       if (window.uiProgress && carBody) {
         const speed = carBody.velocity.length();
@@ -97,6 +97,7 @@ export function initGame(scene, camera, renderer, world, ground) {
         const finishDist = carPos.distanceTo(finishPoint);
         if (finishDist < 10) {
           finished = true;
+          window.isGameFinished = true; // Set finish flag
           if (window.gameTimer) window.gameTimer.stop();
           if (window.vehicle) {
             for (let i = 0; i < window.vehicle.wheelInfos.length; i++) {
