@@ -198,6 +198,41 @@ export class UIStart {
     this.startContainer.appendChild(controlsInfo);
     this.startContainer.appendChild(startButton);
 
+    // Add sound trigger button (top right corner)
+    const soundButton = document.createElement("button");
+    soundButton.style.position = "absolute";
+    soundButton.style.top = "24px";
+    soundButton.style.right = "32px";
+    soundButton.style.zIndex = "1100";
+    soundButton.style.padding = "0";
+    soundButton.style.background = "none";
+    soundButton.style.border = "none";
+    soundButton.style.cursor = "pointer";
+    soundButton.style.width = "60px";
+    soundButton.style.height = "60px";
+
+    // Create image element
+    const soundImg = document.createElement("img");
+    soundImg.style.width = "100%";
+    soundImg.style.height = "100%";
+    soundImg.src = "./assets/SoundOff.png";
+    soundButton.appendChild(soundImg);
+
+    let isSoundOff = true; // Start with sound off
+    soundButton.addEventListener("click", () => {
+      isSoundOff = !isSoundOff;
+      if (isSoundOff) {
+        soundImg.src = "./assets/SoundOff.png";
+        if (this.startingAudio) this.startingAudio.muted = true;
+      } else {
+        soundImg.src = "./assets/SoundOn.png";
+        if (this.startingAudio) this.startingAudio.muted = false;
+        this.playStartingAudio();
+      }
+    });
+
+    this.startContainer.appendChild(soundButton);
+
     // 添加到body
     document.body.appendChild(this.startContainer);
   }
