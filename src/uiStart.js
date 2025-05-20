@@ -37,70 +37,92 @@ export class UIStart {
     logoImg.src = this.logoUrl;
     logoImg.style.maxWidth = "100%";
     logoImg.style.maxHeight = "250px"; // 根據需要調整
-    logoImg.style.marginBottom = "100px";
+    logoImg.style.marginTop = "100px";
     logoImg.alt = "Keep Pushing"; // 無障礙設計替代文字
 
     // 操作說明
     const controlsInfo = document.createElement("div");
-    controlsInfo.style.marginBottom = "20px";
+    controlsInfo.style.marginTop = "200px";
+    controlsInfo.style.marginBottom = "15px";
     controlsInfo.style.fontSize = "0.9em";
     controlsInfo.style.textAlign = "center";
     controlsInfo.innerHTML = `
       <p>GET READY TO RACING</p>
       <p>
-        Use
+        Use Keypboard 
         <span class="key-group">
-          <span class="key-arrow">&#8592;</span>
           <span class="key-arrow">&#8593;</span>
           <span class="key-arrow">&#8595;</span>
+          <span class="key-arrow">&#8592;</span>
           <span class="key-arrow">&#8594;</span>
         </span>
         or
         <span class="key-group">
           <span class="key-wasd">W</span>
-          <span class="key-wasd">A</span>
           <span class="key-wasd">S</span>
+          <span class="key-wasd">A</span>
           <span class="key-wasd">D</span>
         </span>
-        to Control Your Car<br><br>
+        to Control Your Car
       </p>
-      <p>Avoid Obstacles  —  Every crash adds a time penalty!!</p>
+      <p>
+        Use
+        <span class="key-group">
+          <span class="SpaceBar">SPACEBAR</span>
+        </span>
+        to Brake the Car<br><br>
+      </p>
+      <p>⚠️ Avoid Obstacles  —  Every crash adds a time penalty ⚠️</p>
     `;
     // Add styles for key arrows and WASD
     const style = document.createElement("style");
     style.textContent = `
       .key-group {
         display: inline-flex;
-        gap: 6px;
+        gap: 2px;
         vertical-align: middle;
       }
       .key-arrow, .key-wasd {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 28px;
-        min-height: 28px;
-        padding: 2px 8px;
+        min-width: 18px;
+        min-height: 18px;
+        padding: 4px 8px;
         margin: 0 2px;
         background: linear-gradient(145deg, rgba(30,30,30,0.9) 0%, rgba(60,60,60,0.9) 100%);
-        border-radius: 8px;
+        border-radius: 7px;
         border: 1px solid rgba(100,255,255,0.2);
         box-shadow: inset 0 0 15px rgba(0,255,255,0.3),
     0 0 10px rgba(0,255,255,0.2);
-        color: #00fffc;
-        font-family: 'PixelifySans', 'Arial Narrow', Arial, sans-serif;
-        font-size: 1.1em;
+        color:rgb(255, 255, 255);
+        font-size: 1em;
         text-align: center;
         text-shadow: 0 0 8px #00fffc;
         user-select: none;
       }
       .key-arrow {
-        font-size: 1.2em;
+        font-size: 1em;
         font-weight: bold;
       }
-      .key-wasd {
-        font-size: 1.1em;
-        font-weight: bold;
+      .SpaceBar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        min-height: 18px;
+        padding: 4px 40px;
+        margin: 0 2px;
+        background: linear-gradient(145deg, rgba(30,30,30,0.9) 0%, rgba(60,60,60,0.9) 100%);
+        border-radius: 7px;
+        border: 1px solid rgba(100,255,255,0.2);
+        box-shadow: inset 0 0 15px rgba(0,255,255,0.3),
+    0 0 10px rgba(0,255,255,0.2);
+        color:rgb(255, 255, 255);
+        font-size: 1em;
+        text-align: center;
+        text-shadow: 0 0 8px #00fffc;
+        user-select: none;
       }
     `;
     document.head.appendChild(style);
@@ -126,7 +148,7 @@ export class UIStart {
     startButton.style.minWidth = "200px";
     startButton.style.background =
       "linear-gradient(145deg, rgba(30,30,30,0.9) 0%, rgba(60,60,60,0.9) 100%)";
-    startButton.style.color = "#f0f0f0"; // 青色文字
+    startButton.style.color = "#ffffff"; // 白色文字
     startButton.style.fontFamily = '"PixelifySans", "Arial Narrow", sans-serif';
     startButton.style.fontSize = "22px";
     startButton.style.borderRadius = "14px";
@@ -146,7 +168,7 @@ export class UIStart {
         0 0 15px rgba(0,255,255,0.4)
     `;
       startButton.style.transform = "scale(1.02)";
-      startButton.style.color = "#ffffff";
+      startButton.style.color = "#00fffc";
     });
 
     startButton.addEventListener("mouseout", () => {
@@ -155,13 +177,13 @@ export class UIStart {
         0 0 10px rgba(0,255,255,0.2)
     `;
       startButton.style.transform = "scale(1)";
-      startButton.style.color = "#00fffc";
+      startButton.style.color = "#ffffff";
     });
 
     // LED光點 (與計時器相同樣式)
     const buttonLeds = document.createElement("div");
     buttonLeds.style.position = "absolute";
-    buttonLeds.style.bottom = "-280px";
+    buttonLeds.style.bottom = "-380px";
     buttonLeds.style.left = "50%";
     buttonLeds.style.transform = "translateX(-50%)";
     buttonLeds.style.display = "flex";
@@ -201,8 +223,8 @@ export class UIStart {
     // Add sound trigger button (top right corner)
     const soundButton = document.createElement("button");
     soundButton.style.position = "absolute";
-    soundButton.style.top = "24px";
-    soundButton.style.right = "32px";
+    soundButton.style.top = "15px";
+    soundButton.style.right = "15px";
     soundButton.style.zIndex = "1100";
     soundButton.style.padding = "0";
     soundButton.style.background = "none";
@@ -213,8 +235,8 @@ export class UIStart {
 
     // Create image element
     const soundImg = document.createElement("img");
-    soundImg.style.width = "100%";
-    soundImg.style.height = "100%";
+    soundImg.style.width = "80%";
+    soundImg.style.height = "80%";
     soundImg.src = "./assets/SoundOff.png";
     soundButton.appendChild(soundImg);
 

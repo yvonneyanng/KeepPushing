@@ -2,7 +2,7 @@ export class UIProgress {
     constructor(carControl) {
         this.carControl = carControl; // 接收車輛控制實例
         this.speed = 0;
-        this.maxSpeed = 300; // 假設最大速度 (km/h)
+        this.maxSpeed = 350; // 假設最大速度 (km/h)
         this.createSpeedometer(); // 新增時數錶
     }
 
@@ -34,7 +34,7 @@ export class UIProgress {
         this.speedDisplay.style.padding = '30px 60px';
         this.speedDisplay.style.minWidth = '120px';
         this.speedDisplay.style.background = 'linear-gradient(145deg, rgba(30,30,30,0.9) 0%, rgba(60,60,60,0.9) 100%)';
-        this.speedDisplay.style.color = '#00fffc';
+        this.speedDisplay.style.color = '#ffffff';
         this.speedDisplay.style.fontFamily = '"PixelifySans", "Segment7Standard", monospace';
         this.speedDisplay.style.fontSize = '56px';
         this.speedDisplay.style.textAlign = 'center';
@@ -52,10 +52,10 @@ export class UIProgress {
         unitLabel.textContent = 'km/h';
         unitLabel.style.position = 'absolute';
         unitLabel.style.bottom = '40px';
-        unitLabel.style.right = '25px';
+        unitLabel.style.right = '20px';
         unitLabel.style.color = 'rgba(0,255,255,0.7)';
         unitLabel.style.fontSize = '14px';
-        unitLabel.style.fontFamily = 'Arial, sans-serif';
+        unitLabel.style.fontFamily = '"PixelifySans", "Segment7Standard", monospace';
 
         // LED光點 (與計時器相同風格)
         const leds = document.createElement('div');

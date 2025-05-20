@@ -16,10 +16,10 @@ export class UICountdown {
     this.countdownDiv = document.createElement("div");
     this.countdownDiv.id = "countdown";
     this.countdownDiv.style.position = "absolute";
-    this.countdownDiv.style.top = "30%";
+    this.countdownDiv.style.top = "35%";
     this.countdownDiv.style.left = "50%";
     this.countdownDiv.style.transform = "translate(-50%, -50%)";
-    this.countdownDiv.style.fontSize = "80px";
+    this.countdownDiv.style.fontSize = "100px";
     this.countdownDiv.style.color = "#00fffc";
     this.countdownDiv.style.fontFamily =
       '"PixelifySans", "Segment7Standard", monospace';
