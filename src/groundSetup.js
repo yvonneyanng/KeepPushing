@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const size = 1000
-const relocateOffSet = size * 0.1
+const relocateOffSet = size * 0.2
 // export function createMovingGround(scene) {
 //   const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
 //   const groundMaterial = new THREE.MeshPhongMaterial({
