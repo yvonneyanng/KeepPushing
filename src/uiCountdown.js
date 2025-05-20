@@ -3,6 +3,7 @@ export class UICountdown {
     this.onFinish = onFinish;
     this.createCountdownOverlay();
     this.beep = new Audio("/sounds/CountdownSound.mp3");
+    this.finalBeep = new Audio("/sounds/final_beep.mp3");
     this.isBeepLoaded = false
 
     this.beep.addEventListener('loadedmetadata', () => {
@@ -38,7 +39,12 @@ export class UICountdown {
     this.interval = setInterval(() => {
       if (this.isBeepLoaded) {
         if (this.count >= 0) {
-          this.playBeep();
+          if (this.count == 0) {
+            this.playFinalBeep();
+          } else {
+            this.playBeep();
+          }
+          
           this.countdownDiv.textContent = this.count;
           
         } else if (this.count == -1) {
@@ -54,10 +60,18 @@ export class UICountdown {
   }
 
   playBeep() {
-    this.beep.currentTime = 0.5; // Skip the first 0.5 seconds
+    this.beep.currentTime = 0.7; // Skip the first 0.5 seconds
     this.beep.play();
     setTimeout(() => {
       this.beep.pause()
+    }, 600)
+  }
+
+  playFinalBeep() {
+    // this.finalBeep.currentTime = 0.05; // Skip the first 0.5 seconds
+    this.finalBeep.play();
+    setTimeout(() => {
+      this.finalBeep.pause()
     }, 600)
   }
 
