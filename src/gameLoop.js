@@ -3,6 +3,7 @@ import { Car, setupCamera } from "./carControl.js";
 import { loadCarModel, updateCar } from "./car.js";
 import { UIFinish } from "./uiFinish.js";
 import { curve } from "./trackGeneration.js";
+import { Block1 } from "./block1.js";
 
 export function initGame(scene, camera, renderer, world, ground) {
   // Create car
@@ -62,11 +63,15 @@ export function initGame(scene, camera, renderer, world, ground) {
   window.uiFinish = new UIFinish();
   let finished = false;
   window.isGameFinished = false; // Reset finish flag at game start
+
+  // block 
+  const block1 = new Block1(scene, world);
+
   function animate() {
     requestAnimationFrame(animate);
 
     if (carBody && carWrapper) {
-      updateCar(carBody, carWrapper, window.vehicle, camera, world, renderer);
+      updateCar(carBody, carWrapper, window.vehicle, camera, block1);
 
       const carX = carBody.position.x;
       const carZ = carBody.position.z;
