@@ -16,7 +16,7 @@ export function setupScene() {
   const groundBody = new CANNON.Body({
     type: CANNON.Body.STATIC,
     shape: groundShape,
-    position: new CANNON.Vec3(0, 0, 0),
+    position: new CANNON.Vec3(0, -0.7, 0),
     material: groundCANNONMaterial,
   });
   world.addBody(groundBody);
