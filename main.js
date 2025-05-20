@@ -3,6 +3,7 @@ import { setupScene } from "./src/sceneSetup.js";
 import { initGame } from "./src/gameLoop.js";
 import { GameTimer } from "./src/timer.js";
 import { UIProgress } from "./src/uiProgress.js";
+import { UIRPMIndicator } from "./src/uiProgress2.js";
 import { UICountdown } from "./src/uiCountdown.js";
 
 window.isGamePlaying = false;
@@ -14,8 +15,10 @@ class Game {
     this.timer = new GameTimer();
     window.gameTimer = this.timer;
     this.uiProgress = new UIProgress(this.carControl);
+    this.uiProgress2 = new UIRPMIndicator(this.carControl);
     this.initUI();
     window.uiProgress = this.uiProgress;
+    window.uiProgress2 = this.uiProgress2;
   }
 
   initUI() {
@@ -42,8 +45,10 @@ class Game {
     this.isPlaying = true;
     // 啟動計時器
     this.timer.start();
-    // 顯示賽車儀表
+    // 顯示時數錶
     this.uiProgress.show();
+    // 顯示轉數錶
+    this.uiProgress2.show();
   }
 }
 

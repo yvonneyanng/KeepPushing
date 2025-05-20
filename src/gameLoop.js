@@ -86,6 +86,11 @@ export function initGame(scene, camera, renderer, world, ground) {
         const speedKmh = speed * 3.6;
         window.uiProgress.update(speedKmh);
       }
+      if (window.uiProgress2 && carBody) {
+        const speed = carBody.velocity.length();
+        const speedRpm = speed * 3.6;
+        window.uiProgress2.update(speedRpm);
+      }
       if (
         !finished &&
         window.vehicle &&
