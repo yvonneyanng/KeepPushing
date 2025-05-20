@@ -16,7 +16,7 @@ export function setupScene() {
   const groundBody = new CANNON.Body({
     type: CANNON.Body.STATIC,
     shape: groundShape,
-    position: new CANNON.Vec3(0, 0, 0),
+    position: new CANNON.Vec3(0, -0.7, 0),
     material: groundCANNONMaterial,
   });
   world.addBody(groundBody);
@@ -79,7 +79,7 @@ export function setupScene() {
   // Create scene
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000); // Black background
-
+  scene.fog = new THREE.Fog(0xcce0ff, 0, 200);
   // Create camera
   const camera = new THREE.PerspectiveCamera(
     75,

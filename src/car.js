@@ -183,6 +183,8 @@ export function updateCar(
   vehicle,
   camera,
   block1,
+  tree,
+  totalTime,
   world,
   gridSize,
   cellSize,
@@ -200,6 +202,14 @@ export function updateCar(
 
   carWrapper.position.copy(carBody.position);
   carWrapper.quaternion.copy(carBody.quaternion);
+
+
+  if (totalTime - window.lastTotalTime > 1) {
+    tree.checkAndCreate(carBody.position);
+    window.lastTotalTime = totalTime;
+  }
+  tree.checkAndRemove(carBody.position);
+
 
   // if (window.debugBox) {
   //   debugBox.position.copy(carBody.position);
@@ -278,6 +288,10 @@ export function updateCar(
     const willMakeABlock = (t2 * 1000) % 10 == 0
     if (dist < blockMakingDistance && willMakeABlock && t2 >= 0.02) {
       block1.createBlock(t2)
+    }
+
+    if (dist > blockRemovingDistance) {
+      block1.removeBlockAtT(t2)
     }
   }
 
