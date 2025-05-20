@@ -13,7 +13,7 @@ export class Tree {
     this.loaded = [];
     this.makingTreeDistance = 200;
     this.makingCANNONDistance = 20;
-    this.removingCANNONDistance = 25;
+    this.removingCANNONDistance = 40;
     this.removingTreeDistance = 200;
 
     window.allTrees = this.allTrees
@@ -153,7 +153,6 @@ export class Tree {
     const key = this._gridKey(x, z);
     const record = this.allTrees[key];
     if (record) {
-      console.log("RemoveTREE!")
       this.scene.remove(record.mesh);
       if (record.body) this.world.removeBody(record.body);
       delete this.allTrees[key];
@@ -166,6 +165,7 @@ export class Tree {
     if (record && record.body) {
       console.log("Remove CANNON~~~~")
       this.world.removeBody(record.body);
+      delete this.allTrees[key].body
     }
   }
 
@@ -204,7 +204,7 @@ export class Tree {
         this.removeTree(record.mesh.position.x, record.mesh.position.z);
       }
       if (dist > this.removingCANNONDistance) {
-        this.addTreeCANNON(record.mesh.position.x, record.mesh.position.z);
+        this.removeTreeCANNON(record.mesh.position.x, record.mesh.position.z);
       }
     }
   }
