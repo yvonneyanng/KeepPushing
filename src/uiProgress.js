@@ -2,7 +2,7 @@ export class UIProgress {
     constructor(carControl) {
         this.carControl = carControl; // 接收車輛控制實例
         this.speed = 0;
-        this.maxSpeed = 200; // 假設最大速度 (km/h)
+        this.maxSpeed = 300; // 假設最大速度 (km/h)
         this.createSpeedometer(); // 新增時數錶
     }
 

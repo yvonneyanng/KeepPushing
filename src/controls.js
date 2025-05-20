@@ -20,18 +20,6 @@ document.addEventListener("keydown", (e) => {
   if (e.code === "KeyS") moveBackward = true;
   if (e.code === "KeyA") turnLeft = true;
   if (e.code === "KeyD") turnRight = true;
-  if (e.code === "Space") brake = true;
-});
-document.addEventListener("keyup", (e) => {
-  if (!window.isGamePlaying || window.isGameFinished) return;
-  if (e.code === "KeyW") moveForward = false;
-  if (e.code === "KeyS") moveBackward = false;
-  if (e.code === "KeyA") turnLeft = false;
-  if (e.code === "KeyD") turnRight = false;
-  if (e.code === "Space") brake = false;
-});
-document.addEventListener("keydown", (e) => {
-  if (!window.isGamePlaying || window.isGameFinished) return;
   if (e.code === "ArrowUp") moveForward = true;
   if (e.code === "ArrowDown") moveBackward = true;
   if (e.code === "ArrowLeft") turnLeft = true;
@@ -40,6 +28,10 @@ document.addEventListener("keydown", (e) => {
 });
 document.addEventListener("keyup", (e) => {
   if (!window.isGamePlaying || window.isGameFinished) return;
+  if (e.code === "KeyW") moveForward = false;
+  if (e.code === "KeyS") moveBackward = false;
+  if (e.code === "KeyA") turnLeft = false;
+  if (e.code === "KeyD") turnRight = false;
   if (e.code === "ArrowUp") moveForward = false;
   if (e.code === "ArrowDown") moveBackward = false;
   if (e.code === "ArrowLeft") turnLeft = false;
@@ -52,9 +44,9 @@ export function updateControls() {
   if (!vehicle) return;
 
   // 控制參數
-  const engineForce = 10000;
-  const brakeForce = 500; // 降低煞車力道
-  const maxSteer = 0.25; // radians
+  const engineForce = 1000;
+  const brakeForce = 100; // 降低煞車力道
+  const maxSteer = 0.15; // radians
   const maxSpeed = 100; // 自訂，例如 20 公尺/秒
 
   const velocity = vehicle.chassisBody.velocity;

@@ -56,9 +56,11 @@ export function loadCarModel(scene, world) {
       carWrapper.add(carModel);
       scene.add(carWrapper);
 
-      // Align carWrapper with the road's tangent at the start
+      // Align carWrapper and chassisBody with the road's tangent and position at the start
       const startTangent = curve.getTangentAt(0);
       const angle = Math.atan2(startTangent.x, startTangent.z);
+      const startPoint = curve.getPointAt(0.001);
+      carWrapper.position.copy(startPoint);
       carWrapper.rotation.y = angle;
 
       const fudge = 1;
@@ -72,9 +74,14 @@ export function loadCarModel(scene, world) {
       const chassisBody = new CANNON.Body({
         mass: 300,
         shape: chassisShape,
-        position: new CANNON.Vec3(0, (size.y / 2) * fudge + 0.2, 0),
+        position: new CANNON.Vec3(
+          startPoint.x,
+          (size.y / 2) * fudge + 0.2,
+          startPoint.z
+        ),
         material: carMaterial,
       });
+      chassisBody.quaternion.setFromEuler(0, angle + Math.PI, 0);
       chassisBody.linearDamping = 0.02;
       chassisBody.angularDamping = 1;
       // vehicle.chassisBody.ccdSpeedThreshold = 1;

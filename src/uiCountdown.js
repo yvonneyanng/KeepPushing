@@ -2,7 +2,13 @@ export class UICountdown {
   constructor(onFinish) {
     this.onFinish = onFinish;
     this.createCountdownOverlay();
-    this.beepAudioPath = "/sounds/CountdownSound.mp3";
+    this.beep = new Audio("/sounds/CountdownSound.mp3");
+    this.isBeepLoaded = false
+
+    this.beep.addEventListener('loadedmetadata', () => {
+      this.isBeepLoaded = true
+      console.log('✅ 音訊 metadata 載入完成');
+    });
   }
 
   createCountdownOverlay() {
@@ -27,26 +33,32 @@ export class UICountdown {
   start(count = 3) {
     this.count = count;
     this.countdownDiv.style.display = "block";
-    this.countdownDiv.textContent = this.count;
-    this.playBeep();
+    // this.countdownDiv.textContent = this.count;
+
     this.interval = setInterval(() => {
-      this.count--;
-      if (this.count > 0) {
-        this.countdownDiv.textContent = this.count;
-      } else if (this.count === 0) {
-        this.countdownDiv.textContent = "GO!";
-      } else {
-        this.hide();
-        clearInterval(this.interval);
-        if (this.onFinish) this.onFinish();
+      if (this.isBeepLoaded) {
+        if (this.count >= 0) {
+          this.playBeep();
+          this.countdownDiv.textContent = this.count;
+          
+        } else if (this.count == -1) {
+          this.countdownDiv.textContent = "GO!";
+          if (this.onFinish) this.onFinish();
+        } else {
+          this.hide();
+          clearInterval(this.interval);
+        }
       }
+      this.count--;
     }, 1000);
   }
 
   playBeep() {
-    const beep = new Audio(this.beepAudioPath);
-    beep.currentTime = 2.5; // Skip the first 0.5 seconds
-    beep.play();
+    this.beep.currentTime = 0.5; // Skip the first 0.5 seconds
+    this.beep.play();
+    setTimeout(() => {
+      this.beep.pause()
+    }, 600)
   }
 
   hide() {
