@@ -72,7 +72,7 @@ export class UIRPMIndicator {
         this.needle = document.createElement('div');
         this.needle.style.position = 'absolute';
         this.needle.style.width = '1.5px';
-        this.needle.style.height = '45%';
+        this.needle.style.height = '42%';
         this.needle.style.background = '#ff3300';
         this.needle.style.left = '50%';
         this.needle.style.top = '70%';
@@ -127,12 +127,12 @@ export class UIRPMIndicator {
         
         for (let i = 0; i < 3; i++) {
             const dot = document.createElement('div');
-            dot.style.width = '5px';
-            dot.style.height = '5px';
+            dot.style.width = '4px';
+            dot.style.height = '4px';
             dot.style.borderRadius = '50%';
             dot.style.background = '#00fffc';
             dot.style.boxShadow = '0 0 3px #00fffc';
-            dot.style.opacity = '0.8';
+            dot.style.opacity = '0.6';
             dot.style.animation = `pulse ${0.6 + i*0.2}s infinite alternate`;
             leds.appendChild(dot);
         }

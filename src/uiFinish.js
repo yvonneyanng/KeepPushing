@@ -11,7 +11,9 @@ export class UIFinish {
     this.finishContainer.style.left = "0";
     this.finishContainer.style.width = "100vw";
     this.finishContainer.style.height = "100vh";
-    this.finishContainer.style.background = "rgba(0,0,0,0.7)";
+    this.finishContainer.style.backgroundColor = "rgba(0, 0, 0, 0.4)";
+    this.finishContainer.style.backdropFilter = "blur(8px)";
+    this.finishContainer.style.webkitBackdropFilter = "blur(8px)"; // Safari 支援
     this.finishContainer.style.display = "flex";
     this.finishContainer.style.flexDirection = "column";
     this.finishContainer.style.justifyContent = "center";
@@ -21,35 +23,40 @@ export class UIFinish {
 
     // Title
     const title = document.createElement("div");
-    title.textContent = "FINISH!";
-    title.style.fontSize = "48px";
+    title.textContent = "FINISH!!";
+    title.style.fontSize = "80px";
     title.style.color = "#00fffc";
     title.style.fontFamily = "PixelifySans, Arial, sans-serif";
     title.style.textShadow = "0 0 16px #00fffc, 0 0 32px #000";
-    title.style.marginBottom = "32px";
+    title.style.marginBottom = "180px";
     this.finishContainer.appendChild(title);
 
     // Time display
     this.timeDisplay = document.createElement("div");
-    this.timeDisplay.style.fontSize = "32px";
-    this.timeDisplay.style.color = "#fff";
+    this.timeDisplay.style.fontSize = "60px";
+    this.timeDisplay.style.color = "#ffffff";
     this.timeDisplay.style.fontFamily = "PixelifySans, Arial, sans-serif";
-    this.timeDisplay.style.marginBottom = "32px";
+    this.timeDisplay.style.marginBottom = "200px";
     this.finishContainer.appendChild(this.timeDisplay);
 
     // Restart button
     const restartButton = document.createElement("button");
-    restartButton.textContent = "Restart";
-    restartButton.style.fontSize = "24px";
-    restartButton.style.padding = "12px 36px";
-    restartButton.style.borderRadius = "12px";
-    restartButton.style.border = "none";
+    restartButton.textContent = "RESTART";
+    restartButton.style.fontSize = "22px";
+    restartButton.style.padding = "10px 20px";
+    restartButton.style.minWidth = "200px";
+    restartButton.style.borderRadius = "14px";
+    restartButton.style.border = "1px solid rgba(100,255,255,0.2)";
     restartButton.style.background =
-      "linear-gradient(135deg, #00fffc 0%, #0066ff 100%)";
-    restartButton.style.color = "#222";
+      "linear-gradient(145deg, rgba(30,30,30,0.9) 0%, rgba(60,60,60,0.9) 100%)";
+    restartButton.style.color = "#ffffff";
     restartButton.style.fontFamily = "PixelifySans, Arial, sans-serif";
     restartButton.style.cursor = "pointer";
-    restartButton.style.boxShadow = "0 0 12px #00fffc, 0 2px 8px #000";
+    restartButton.style.textShadow = "0 0 8px #00fffc";
+    restartButton.style.boxShadow = `
+    inset 0 0 15px rgba(0,255,255,0.3),
+    0 0 10px rgba(0,255,255,0.2)
+`;
     restartButton.addEventListener("click", () => {
       window.location.reload();
     });

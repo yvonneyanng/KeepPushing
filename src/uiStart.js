@@ -196,7 +196,7 @@ export class UIStart {
       dot.style.borderRadius = "50%";
       dot.style.background = "#00fffc";
       dot.style.boxShadow = "0 0 6px #00fffc";
-      dot.style.opacity = "0.8";
+      dot.style.opacity = "1";
       dot.style.animation = `pulse ${0.8 + i * 0.2}s infinite alternate`;
       buttonLeds.appendChild(dot);
     }
