@@ -12,6 +12,15 @@ import { Block1 } from "./block1.js";
 
 const blockMakingDistance = 100;
 const blockRemovingDistance = 1000;
+
+window.timeV = {
+  totalTime: 0,
+  lastTotalTime: 0,
+  lastTotalTime2: 0,
+  lastMapDrawTime: 0,
+  clock: null,
+}
+
 export function loadCarModel(scene, world) {
   return new Promise((resolve) => {
     const baseColorMap = textureLoader.load(
@@ -48,6 +57,7 @@ export function loadCarModel(scene, world) {
         }
       });
 
+      window.timeV.clock = new THREE.Clock();
       const carModel = object;
       carModel.scale.set(0.0015, 0.0015, 0.0015);
       const box = new THREE.Box3().setFromObject(carModel);
@@ -161,14 +171,19 @@ export function loadCarModel(scene, world) {
 
       chassisBody.addEventListener("collide", (event) => {
         const otherBody = event.body;
+
+        // If it hits a block
+        if (otherBody.material?.name === "block" || otherBody.material?.name === "tree") {
+          if (window.timeV.totalTime - window.timeV.lastTotalTime2 > 1) { // 一秒內最多計算一次碰撞
+            window.uiProgress3.increment(1)
+            window.timeV.lastTotalTime2 = window.timeV.totalTime;
+          }
+        }
+
         if (otherBody.material && otherBody.material.name === "wall") {
           const relativeX = otherBody.position.x - chassisBody.position.x;
           const forceDirection = relativeX > 0 ? -1 : 1;
-          // const forceMagnitude = 1000;
-          // const force = new CANNON.Vec3(forceDirection * forceMagnitude, 0, 1000);
-          // chassisBody.applyForce(force, chassisBody.position);
 
-          // Also move the car slightly to separate it from the wall
           const bounceOffset = new CANNON.Vec3(forceDirection * 0.03, 0, 0);
           chassisBody.position.vadd(bounceOffset, chassisBody.position);
         }
@@ -179,25 +194,6 @@ export function loadCarModel(scene, world) {
   });
 }
 
-export function setupCollisionDetection(carBody, block1) {
-    // 使用包圍盒檢測
-    const carBox = new THREE.Box3().setFromObject(carBody);
-    
-    return function checkCollisions() {
-        let collisionCount = 0;
-        carBox.setFromObject(carBody);
-
-        block1.forEach(block1 => {
-            const obstacleBox = new THREE.Box3().setFromObject(block1);
-            if (carBox.intersectsBox(obstacleBox)) {
-                collisionCount++;
-                this.handleSingleCollision(block1);
-            }
-        });
-        return collisionCount;
-    };
-}
-
 export function updateCar(
   carBody,
   carWrapper,
@@ -205,7 +201,6 @@ export function updateCar(
   camera,
   block1,
   tree,
-  totalTime,
   world,
   gridSize,
   cellSize,
@@ -221,6 +216,7 @@ export function updateCar(
   //   window.controls.update();
   // }
 
+  window.timeV.totalTime = window.timeV.clock.getElapsedTime();
   carWrapper.position.copy(carBody.position);
   carWrapper.quaternion.copy(carBody.quaternion);
 
@@ -320,21 +316,25 @@ export function updateCar(
   }
 
     
-    if (totalTime - window.lastTotalTime > 0.5) {
+    if (window.timeV.totalTime - window.timeV.lastTotalTime > 0.5) {
       // 車子前方 100 的位置
       const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(carWrapper.quaternion).normalize();
       const frontPos = new THREE.Vector3(
-        carBody.position.x,
-        carBody.position.y,
-        carBody.position.z
+        carWrapper.position.x,
+        carWrapper.position.y,
+        carWrapper.position.z
       ).add(forward.multiplyScalar(100));
 
-      tree.checkAndCreate(frontPos, closestT);
-      window.lastTotalTime = totalTime;
+      tree.checkAndCreate(carWrapper, closestT);
+      window.timeV.lastTotalTime = window.timeV.totalTime;
 
-      tree.checkAndRemove(frontPos);
+      tree.checkAndRemove(carWrapper.position);
     }
     
 
-   miniMap.drawMap(carPos, carWrapper.quaternion);
+    if (window.timeV.totalTime - window.timeV.lastMapDrawTime > 1) {
+      miniMap.drawMap(carPos, carWrapper.quaternion);
+      window.timeV.lastMapDrawTime = window.timeV.totalTime
+    } 
+   
 }
