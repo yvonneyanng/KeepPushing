@@ -13,8 +13,8 @@ export class Tree {
     this.loaded = [];
     this.makingTreeDistance = 120;
     this.makingCANNONDistance = 20;
-    this.removingCANNONDistance = 40;
-    this.removingTreeDistance = 150;
+    this.removingCANNONDistance = 25;
+    this.removingTreeDistance = 121;
     this.closestT = 0
     this.frontDistanceFromCar = 100;
 
@@ -213,15 +213,29 @@ export class Tree {
     }
   }
 
-  checkAndRemove(position) {
-    const px = position.x;
-    const pz = position.z;
+  checkAndRemove(carWrapper) {
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(carWrapper.quaternion).normalize();
+    const position = new THREE.Vector3(
+      carWrapper.position.x,
+      carWrapper.position.y,
+      carWrapper.position.z
+    ).add(forward.multiplyScalar(this.frontDistanceFromCar));
+
+    const fpx = position.x;
+    const fpz = position.z;
+
+    const px = carWrapper.position.x;
+    const pz = carWrapper.position.z;
     for (const key in this.allTrees) {
       const record = this.allTrees[key];
+      const fdx = record.mesh.position.x - fpx;
+      const fdz = record.mesh.position.z - fpz;
+      const fDist = Math.sqrt(fdx * fdx + fdz * fdz);
+
       const dx = record.mesh.position.x - px;
       const dz = record.mesh.position.z - pz;
       const dist = Math.sqrt(dx * dx + dz * dz);
-      if (dist > this.removingTreeDistance) {
+      if (fDist > this.removingTreeDistance) {
         this.removeTree(record.mesh.position.x, record.mesh.position.z);
       }
       if (dist > this.removingCANNONDistance) {

@@ -328,7 +328,7 @@ export function updateCar(
       tree.checkAndCreate(carWrapper, closestT);
       window.timeV.lastTotalTime = window.timeV.totalTime;
 
-      tree.checkAndRemove(carWrapper.position);
+      tree.checkAndRemove(carWrapper);
     }
     
 
