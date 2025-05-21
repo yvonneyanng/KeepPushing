@@ -11,10 +11,11 @@ export class Tree {
     this.allTrees = {};
     this.treeModel = [];
     this.loaded = [];
-    this.makingTreeDistance = 200;
+    this.makingTreeDistance = 100;
     this.makingCANNONDistance = 20;
     this.removingCANNONDistance = 40;
-    this.removingTreeDistance = 200;
+    this.removingTreeDistance = 150;
+    this.closestT = 0
 
     window.allTrees = this.allTrees
     this.loadTree(1);
@@ -89,7 +90,7 @@ export class Tree {
     // Avoid placing trees too close to the road
     const treePos = new THREE.Vector3(rx, 0, rz);
     let tooClose = false;
-    for (let t = 0; t <= 1; t += 0.001) {
+    for (let t = this.closestT > 0.002 ? this.closestT - 0.002 : 0 ; t <= this.closestT + 0.02; t += 0.001) {
       const p = curve.getPointAt(t);
       if (p.distanceTo(treePos) < roadWidth + 5) {
         tooClose = true;
@@ -169,7 +170,8 @@ export class Tree {
     }
   }
 
-  checkAndCreate(position) {
+  checkAndCreate(position, closestT = 0) {
+    this.closestT = closestT;
     if (!this.loaded[0] || !this.loaded[1]) return;
     const px = position.x;
     const pz = position.z;

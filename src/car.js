@@ -5,6 +5,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 const textureLoader = new THREE.TextureLoader();
 import { updateControls } from "./controls.js";
 import { curve, roadWidth } from "./trackGeneration.js";
+import { SmallMap } from "./smallMap.js";
+const miniMap = new SmallMap();
 
 import { Block1 } from "./block1.js";
 
@@ -63,7 +65,7 @@ export function loadCarModel(scene, world) {
       // Align carWrapper and chassisBody with the road's tangent and position at the start
       const startTangent = curve.getTangentAt(0);
       const angle = Math.atan2(startTangent.x, startTangent.z);
-      const startPoint = curve.getPointAt(0.001);
+      const startPoint = curve.getPointAt(0.0015);
       carWrapper.position.copy(startPoint);
       carWrapper.rotation.y = angle;
 
@@ -203,14 +205,6 @@ export function updateCar(
   carWrapper.position.copy(carBody.position);
   carWrapper.quaternion.copy(carBody.quaternion);
 
-
-  if (totalTime - window.lastTotalTime > 1) {
-    tree.checkAndCreate(carBody.position);
-    window.lastTotalTime = totalTime;
-  }
-  tree.checkAndRemove(carBody.position);
-
-
   // if (window.debugBox) {
   //   debugBox.position.copy(carBody.position);
   //   debugBox.quaternion.copy(carBody.quaternion);
@@ -275,12 +269,14 @@ export function updateCar(
   const carPos2D = new THREE.Vector2(carBody.position.x, carBody.position.z);
   let closestDist = Infinity;
 
+  let closestT = 0
   for (let t = 0; t <= 1; t += 0.001) {
     const point = curve.getPointAt(t);
     const point2D = new THREE.Vector2(point.x, point.z);
     const dist = carPos2D.distanceTo(point2D);
     if (dist < closestDist) {
       closestDist = dist;
+      closestT = t
     }
 
     // make the block1
@@ -303,4 +299,19 @@ export function updateCar(
   } else {
     vehicle.maxSpeedRate = 1;
   }
+
+    // 車子前方 100 的位置
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(carWrapper.quaternion).normalize();
+    const frontPos = new THREE.Vector3(
+      carBody.position.x,
+      carBody.position.y,
+      carBody.position.z
+    ).add(forward.multiplyScalar(100));
+    if (totalTime - window.lastTotalTime > 0.1) {
+      tree.checkAndCreate(frontPos, closestT);
+      window.lastTotalTime = totalTime;
+    }
+    tree.checkAndRemove(frontPos);
+
+   miniMap.drawMap(carPos, carWrapper.quaternion);
 }
