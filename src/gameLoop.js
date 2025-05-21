@@ -1,6 +1,6 @@
 import { Car, setupCamera } from "./carControl.js";
 
-import { loadCarModel, updateCar } from "./car.js";
+import { loadCarModel, setupCollisionDetection, updateCar } from "./car.js";
 import { UIFinish } from "./uiFinish.js";
 import { curve } from "./trackGeneration.js";
 import { Block1 } from "./block1.js";
@@ -8,6 +8,7 @@ import { Block1 } from "./block1.js";
 export function initGame(scene, camera, renderer, world, ground) {
   // Create car
   // const car = new Car(scene);
+  let collisionChecker; // 碰撞檢測函數
   let carModel, carBody, carWrapper, carShaderMaterial;
 
   loadCarModel(scene, world).then(
@@ -22,6 +23,8 @@ export function initGame(scene, camera, renderer, world, ground) {
       carBody = loadedCarBody;
       // For controls.js to access the vehicle
       window.vehicle = vehicle;
+      const block1 = [block1]; 
+      collisionChecker  = setupCollisionDetection(carBody, block1);
       // Optionally, set up wheelMeshes or other car-specific logic here
     }
   );
@@ -86,15 +89,20 @@ export function initGame(scene, camera, renderer, world, ground) {
         ground.position.set(carX, -0.1, carZ);
       }
 
-      if (window.uiProgress && carBody) {
+      if (window.uiProgress && carBody) { // 時速
         const speed = carBody.velocity.length();
         const speedKmh = speed * 3.6;
         window.uiProgress.update(speedKmh);
       }
-      if (window.uiProgress2 && carBody) {
+      if (window.uiProgress2 && carBody) { // 轉速
         const speed = carBody.velocity.length();
         const speedRpm = speed * 3.6;
         window.uiProgress2.update(speedRpm);
+      }
+      if (collisionChecker && carBody) { // 碰撞檢測
+        const collisionCount = collisionChecker.checkCollisions();
+        if (collisionCount > 0 && window.uiProgress3);
+        window.uiProgress3.increment(collisionCount);
       }
       if (
         !finished &&

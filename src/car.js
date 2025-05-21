@@ -177,6 +177,25 @@ export function loadCarModel(scene, world) {
   });
 }
 
+export function setupCollisionDetection(carBody, block1) {
+    // 使用包圍盒檢測
+    const carBox = new THREE.Box3().setFromObject(carBody);
+    
+    return function checkCollisions() {
+        let collisionCount = 0;
+        carBox.setFromObject(carBody);
+
+        block1.forEach(block1 => {
+            const obstacleBox = new THREE.Box3().setFromObject(block1);
+            if (carBox.intersectsBox(obstacleBox)) {
+                collisionCount++;
+                this.handleSingleCollision(block1);
+            }
+        });
+        return collisionCount;
+    };
+}
+
 export function updateCar(
   carBody,
   carWrapper,
