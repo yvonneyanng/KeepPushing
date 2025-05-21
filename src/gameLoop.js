@@ -99,6 +99,9 @@ export function initGame(scene, camera, renderer, world, ground) {
         const speedRpm = speed * 3.6;
         window.uiProgress2.update(speedRpm);
       }
+      if (carBody) {
+        smallMap.drawMap(carBody.position, carBody.quaternion); // 小地圖：確保傳入車輛位置和旋轉
+      }
 
       if (
         !finished &&
@@ -109,7 +112,7 @@ export function initGame(scene, camera, renderer, world, ground) {
         const finishPoint = curve.getPointAt(1);
         const carPos = carWrapper.position;
         const finishDist = carPos.distanceTo(finishPoint);
-        if (finishDist < 10000) {
+        if (finishDist < 10) {
           finished = true;
           window.isGameFinished = true; // Set finish flag
           if (window.gameTimer) window.gameTimer.stop();
@@ -129,7 +132,7 @@ export function initGame(scene, camera, renderer, world, ground) {
           const timeString = window.gameTimer
             ? window.gameTimer.formatTime(window.gameTimer.getCurrentTime())
             : "--:--:--";
-          const crashCount = window.uiProgress3?.collisionCount || 0; // 從碰撞計數器獲取值
+          const crashCount = window.uiProgress3?.collisionCount || "000"; // 從碰撞計數器獲取值
           if (window.uiFinish) window.uiFinish.show(timeString, crashCount); 
         }
       }
