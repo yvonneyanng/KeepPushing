@@ -6,15 +6,17 @@ export class SmallMap {
     this.sizeWidth = width;
     this.sizeHeight = height;
     this.carPosition = new THREE.Vector3();
+    this.isVisible = false;
 
     // Set up canvas
     this.canvas = document.createElement("canvas");
     this.canvas.width = this.sizeWidth;
     this.canvas.height = this.sizeHeight;
-    this.canvas.style.position = "absolute";
-    this.canvas.style.top = "10px";
-    this.canvas.style.right = "10px";
-    this.canvas.style.border = "1px solid white";
+    this.canvas.style.position = "fixed";
+    this.canvas.style.top = "15px";
+    this.canvas.style.right = "15px";
+    this.canvas.style.zIndex = "100"; // 確保在最上層
+    this.canvas.style.display = "none";
     document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
 
@@ -32,12 +34,6 @@ export class SmallMap {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.sizeWidth, this.sizeHeight);
 
-    // Draw green background with 0.7 opacity
-    ctx.fillStyle = 'rgba(0, 128, 0, 0.7)';
-    ctx.fillRect(0, 0, this.sizeWidth, this.sizeHeight);
-
-    ctx.globalAlpha = 0.8;
-
     // Draw road track centered on trackCenter position
     ctx.beginPath();
     this.trackPoints.forEach((p, i) => {
@@ -48,8 +44,11 @@ export class SmallMap {
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
-    ctx.lineWidth = 4;
+
+    ctx.lineWidth = 8;
     ctx.strokeStyle = "#222222";
+    ctx.shadowColor = '#00fffc';
+    ctx.shadowBlur = 4
     ctx.stroke();
 
     // Draw car position
@@ -57,8 +56,12 @@ export class SmallMap {
     const carY = this.sizeHeight / 2 + (this.carPosition.z - this.trackCenter.z) * this.scale;
     ctx.fillStyle = "#ff4444";
     ctx.beginPath();
-    ctx.arc(carX, carY, 4, 0, Math.PI * 2);
+    ctx.arc(carX, carY, 5, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowColor = '#ff4444';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
 
     // Draw car heading arrow
     // Arrow parameters
@@ -89,5 +92,15 @@ export class SmallMap {
     ctx.fill();
 
     ctx.globalAlpha = 1;
+  }
+
+  show() {
+    this.isVisible = true;
+    this.canvas.style.display = 'block';
+  }
+
+  hide() {
+    this.isVisible = false;
+    this.canvas.style.display = 'none';
   }
 }

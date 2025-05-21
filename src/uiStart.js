@@ -230,8 +230,8 @@ export class UIStart {
     soundButton.style.background = "none";
     soundButton.style.border = "none";
     soundButton.style.cursor = "pointer";
-    soundButton.style.width = "60px";
-    soundButton.style.height = "60px";
+    soundButton.style.width = "50px";
+    soundButton.style.height = "50px";
 
     // Create image element
     const soundImg = document.createElement("img");

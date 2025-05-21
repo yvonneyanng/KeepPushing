@@ -1,11 +1,14 @@
 import { UIStart } from "./src/uiStart.js";
 import { setupScene } from "./src/sceneSetup.js";
 import { initGame } from "./src/gameLoop.js";
+
+import { UICountdown } from "./src/uiCountdown.js";
+
 import { GameTimer } from "./src/timer.js";
 import { UIProgress } from "./src/uiProgress.js";
 import { UIRPMIndicator } from "./src/uiProgress2.js";
 import { UICollisionCounter } from "./src/uiProgress3.js";
-import { UICountdown } from "./src/uiCountdown.js";
+import { SmallMap } from "./src/smallMap.js";
 
 window.isGamePlaying = false;
 
@@ -14,14 +17,16 @@ class Game {
     this.isPlaying = false;
     // 初始化核心系統
     this.timer = new GameTimer();
-    window.gameTimer = this.timer;
     this.uiProgress = new UIProgress(this.carControl);
     this.uiProgress2 = new UIRPMIndicator(this.carControl);
     this.uiProgress3 = new UICollisionCounter();
+    this.smallMap = new SmallMap();
     this.initUI();
+    window.gameTimer = this.timer;
     window.uiProgress = this.uiProgress;
     window.uiProgress2 = this.uiProgress2;
     window.uiProgress3 = this.uiProgress3;
+    window.smallMap = this.smallMap;
   }
 
   initUI() {
@@ -54,6 +59,8 @@ class Game {
     this.uiProgress2.show();
     // 顯示計數器
     this.uiProgress3.show();
+    // 顯示小地圖
+    this.smallMap.show();
   }
 }
 
