@@ -11,7 +11,7 @@ export function setupSky(scene, light) {
 
   const uniforms = sky.material.uniforms;
   uniforms["turbidity"].value = 10;
-  uniforms["rayleigh"].value = 2;
+  uniforms["rayleigh"].value = 0.5;
   uniforms["mieCoefficient"].value = 0.005;
   uniforms["mieDirectionalG"].value = 0.8;
 
@@ -39,7 +39,7 @@ export function setupSky(scene, light) {
     light2.position.copy(sun2.clone().multiplyScalar(10000));
   }
 
-  scene.background = new THREE.Color(0xbfd1e5); // Optional fallback
+  scene.background = new THREE.Color(0x162544); // Optional fallback
 
   return sun;
 }
