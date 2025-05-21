@@ -1,7 +1,5 @@
-import * as THREE from 'three'
 
-import { Car, setupCamera } from "./carControl.js";
-
+import { loadCarModel, updateCar } from "./car.js";
 import { UIFinish } from "./uiFinish.js";
 import { curve } from "./trackGeneration.js";
 import { Block1 } from "./block1.js";
@@ -72,14 +70,11 @@ export function initGame(scene, camera, renderer, world, ground) {
   // tree
   const tree = new Tree(scene, world);
   
-  const clock = new THREE.Clock();
-  window.lastTotalTime = 0;
-
   function animate() {
     requestAnimationFrame(animate);
-    const totalTime = clock.getElapsedTime();
+    
     if (carBody && carWrapper) {
-      updateCar(carBody, carWrapper, window.vehicle, camera, block1, tree, totalTime);
+      updateCar(carBody, carWrapper, window.vehicle, camera, block1, tree);
 
       const carX = carBody.position.x;
       const carZ = carBody.position.z;

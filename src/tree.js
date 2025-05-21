@@ -16,6 +16,7 @@ export class Tree {
     this.removingCANNONDistance = 40;
     this.removingTreeDistance = 150;
     this.closestT = 0
+    this.frontDistanceFromCar = 100;
 
     window.allTrees = this.allTrees
     this.loadTree(1);
@@ -170,25 +171,41 @@ export class Tree {
     }
   }
 
-  checkAndCreate(position, closestT = 0) {
+  checkAndCreate(carWrapper, closestT = 0) {
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(carWrapper.quaternion).normalize();
+    const frontPos = new THREE.Vector3(
+      carWrapper.position.x,
+      carWrapper.position.y,
+      carWrapper.position.z
+    ).add(forward.multiplyScalar(this.frontDistanceFromCar));
+
     this.closestT = closestT;
     if (!this.loaded[0] || !this.loaded[1]) return;
-    const px = position.x;
-    const pz = position.z;
+    const fpx = frontPos.x;
+    const fpz = frontPos.z;
+    const px = carWrapper.position.x
+    const pz = carWrapper.position.z
     const gridRadius = Math.ceil(this.makingTreeDistance / this.size);
 
     for (let dx = -gridRadius; dx <= gridRadius; dx++) {
       for (let dz = -gridRadius; dz <= gridRadius; dz++) {
+        const fgx = Math.floor(fpx / this.size) + dx;
+        const fgz = Math.floor(fpz / this.size) + dz;
+        const fcx = fgx * this.size + (this.size / 2);
+        const fcz = fgz * this.size + (this.size / 2);
+        const fDist = Math.hypot(fpx - fcx, fpz - fcz);
+
         const gx = Math.floor(px / this.size) + dx;
         const gz = Math.floor(pz / this.size) + dz;
         const cx = gx * this.size + (this.size / 2);
         const cz = gz * this.size + (this.size / 2);
         const dist = Math.hypot(px - cx, pz - cz);
-        if (dist <= this.makingTreeDistance) {
-          this.createTree(cx, cz);
-          if (dist <= this.makingCANNONDistance) {
-            this.addTreeCANNON(cx, cz);
-          }
+
+        if (fDist <= this.makingTreeDistance) {
+          this.createTree(fcx, fcz);
+        }
+        if (dist <= this.makingCANNONDistance) {
+          this.addTreeCANNON(cx, cz);
         }
       }
     }
