@@ -91,7 +91,9 @@ export class Tree {
     // Avoid placing trees too close to the road
     const treePos = new THREE.Vector3(rx, 0, rz);
     let tooClose = false;
-    for (let t = this.closestT > 0.002 ? this.closestT - 0.002 : 0 ; t <= this.closestT + 0.02; t += 0.001) {
+    for (let tt = this.closestT - 0.02; tt <= this.closestT + 0.02; tt += 0.001) {
+      let t = Math.round(((1 + tt) * 1000) % 1000)/1000
+      t = t > 1 ? 1 : t;
       const p = curve.getPointAt(t);
       if (p.distanceTo(treePos) < roadWidth + 5) {
         tooClose = true;
