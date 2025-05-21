@@ -13,7 +13,7 @@ export class SmallMap {
     this.canvas.width = this.sizeWidth;
     this.canvas.height = this.sizeHeight;
     this.canvas.style.position = "fixed";
-    this.canvas.style.top = "15px";
+    this.canvas.style.top = "10px";
     this.canvas.style.right = "15px";
     this.canvas.style.zIndex = "100"; // 確保在最上層
     this.canvas.style.display = "none";
