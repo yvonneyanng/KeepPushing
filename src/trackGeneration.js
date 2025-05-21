@@ -6,35 +6,51 @@ const roadWidth = 20;
 const roadLength = 10000; // 10 kilometers (10000 meters)
 
 // Create a curved path for the road
-const curve = new THREE.CatmullRomCurve3([
-  new THREE.Vector3(0, 0, 0),
-  new THREE.Vector3(100, 0, -200),
-  new THREE.Vector3(300, 0, -400),
-  new THREE.Vector3(0, 0, -800),
-  new THREE.Vector3(-200, 0, -1200),
-  new THREE.Vector3(-400, 0, -1600),
-  new THREE.Vector3(-200, 0, -2000),
-  new THREE.Vector3(0, 0, -2400),
-  new THREE.Vector3(200, 0, -2800),
-  new THREE.Vector3(400, 0, -3200),
-  new THREE.Vector3(200, 0, -3600),
-  new THREE.Vector3(0, 0, -4000),
-  new THREE.Vector3(-200, 0, -4400),
-  new THREE.Vector3(-400, 0, -4800),
-  new THREE.Vector3(-200, 0, -5200),
-  new THREE.Vector3(0, 0, -5600),
-  new THREE.Vector3(200, 0, -6000),
-  new THREE.Vector3(400, 0, -6400),
-  new THREE.Vector3(200, 0, -6800),
-  new THREE.Vector3(0, 0, -7200),
-  new THREE.Vector3(-200, 0, -7600),
-  new THREE.Vector3(-400, 0, -8000),
-  new THREE.Vector3(-200, 0, -8400),
-  new THREE.Vector3(0, 0, -8800),
-  new THREE.Vector3(200, 0, -9200),
-  new THREE.Vector3(0, 0, -9600),
-  new THREE.Vector3(0, 0, -10000),
-]);
+// const curve = new THREE.CatmullRomCurve3([
+//   new THREE.Vector3(0, 0, 0),
+//   new THREE.Vector3(100, 0, -200),
+//   new THREE.Vector3(300, 0, -400),
+//   new THREE.Vector3(0, 0, -800),
+//   new THREE.Vector3(-200, 0, -1200),
+//   new THREE.Vector3(-400, 0, -1600),
+//   new THREE.Vector3(-200, 0, -2000),
+//   new THREE.Vector3(0, 0, -2400),
+//   new THREE.Vector3(200, 0, -2800),
+//   new THREE.Vector3(400, 0, -3200),
+//   new THREE.Vector3(200, 0, -3600),
+//   new THREE.Vector3(0, 0, -4000),
+//   new THREE.Vector3(-200, 0, -4400),
+//   new THREE.Vector3(-400, 0, -4800),
+//   new THREE.Vector3(-200, 0, -5200),
+//   new THREE.Vector3(0, 0, -5600),
+//   new THREE.Vector3(200, 0, -6000),
+//   new THREE.Vector3(400, 0, -6400),
+//   new THREE.Vector3(200, 0, -6800),
+//   new THREE.Vector3(0, 0, -7200),
+//   new THREE.Vector3(-200, 0, -7600),
+//   new THREE.Vector3(-400, 0, -8000),
+//   new THREE.Vector3(-200, 0, -8400),
+//   new THREE.Vector3(0, 0, -8800),
+//   new THREE.Vector3(200, 0, -9200),
+//   new THREE.Vector3(0, 0, -9600),
+//   new THREE.Vector3(0, 0, -10000),
+// ]);
+
+// 設計一組人工閉環環狀賽道控制點
+const NUM_POINTS = 24 + Math.floor(Math.random() * 12); // 多邊形的頂點數，決定彎道數
+const RADIUS = 3600; // 基本半徑
+const points = [];
+for (let i = 0; i < NUM_POINTS; i++) {
+  const angle = (i / NUM_POINTS) * Math.PI * 2;
+  // 增加不規則變化產生彎道
+  const noise = Math.sin(i * (1 + Math.random() * 2.1)) * 300 + Math.cos(i * (0.75 + Math.random() * 1.5)) * 220 + Math.sin(i * (0.5 + Math.random() * 0.8)) * 150;
+  const x = Math.cos(angle) * (RADIUS + noise);
+  const z = Math.sin(angle) * (RADIUS + noise);
+  const y = 0; // 若要高低起伏可加 sin/cos
+  points.push(new THREE.Vector3(x, y, z));
+}
+
+const curve = new THREE.CatmullRomCurve3(points, true); 
 
 // Create the road geometry using TubeGeometry
 const roadGeometry = new THREE.TubeGeometry(
