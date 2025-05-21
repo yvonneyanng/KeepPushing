@@ -11,7 +11,7 @@ export class Tree {
     this.allTrees = {};
     this.treeModel = [];
     this.loaded = [];
-    this.makingTreeDistance = 100;
+    this.makingTreeDistance = 120;
     this.makingCANNONDistance = 20;
     this.removingCANNONDistance = 40;
     this.removingTreeDistance = 150;

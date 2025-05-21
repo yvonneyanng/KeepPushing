@@ -300,18 +300,22 @@ export function updateCar(
     vehicle.maxSpeedRate = 1;
   }
 
-    // 車子前方 100 的位置
-    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(carWrapper.quaternion).normalize();
-    const frontPos = new THREE.Vector3(
-      carBody.position.x,
-      carBody.position.y,
-      carBody.position.z
-    ).add(forward.multiplyScalar(100));
-    if (totalTime - window.lastTotalTime > 0.1) {
+    
+    if (totalTime - window.lastTotalTime > 0.5) {
+      // 車子前方 100 的位置
+      const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(carWrapper.quaternion).normalize();
+      const frontPos = new THREE.Vector3(
+        carBody.position.x,
+        carBody.position.y,
+        carBody.position.z
+      ).add(forward.multiplyScalar(100));
+
       tree.checkAndCreate(frontPos, closestT);
       window.lastTotalTime = totalTime;
+
+      tree.checkAndRemove(frontPos);
     }
-    tree.checkAndRemove(frontPos);
+    
 
    miniMap.drawMap(carPos, carWrapper.quaternion);
 }
